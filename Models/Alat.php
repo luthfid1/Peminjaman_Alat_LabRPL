@@ -106,4 +106,50 @@ class Alat {
 
         return $stats;
     }
+
+    public function getTopBorrowedAlat($limit = 5) {
+        try {
+            $query = "SELECT a.nama_alat, a.kode, COALESCE(SUM(dp.jumlah), 0) as total_pinjam
+                      FROM detail_peminjaman dp
+                      JOIN alat a ON dp.id_alat = a.id
+                      JOIN peminjaman p ON dp.id_peminjaman = p.id
+                      WHERE p.status IN ('disetujui', 'dipinjam', 'dikembalikan')
+                      GROUP BY a.id, a.nama_alat, a.kode
+                      ORDER BY total_pinjam DESC
+                      LIMIT :limit";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+            $stmt->execute();
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            if (!empty($results)) {
+                return $results;
+            }
+        } catch (Exception $e) {}
+
+        // Fallback jika belum ada transaksi: ambil alat teratas
+        try {
+            $q = $this->conn->query("SELECT nama_alat, kode, 0 as total_pinjam FROM alat ORDER BY id ASC LIMIT 5");
+            return $q->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    public function getKondisiDistribution() {
+        $dist = ['Baik' => 0, 'Rusak Ringan' => 0, 'Rusak Berat' => 0];
+        try {
+            $query = "SELECT kondisi, SUM(jumlah) as total FROM alat GROUP BY kondisi";
+            $stmt = $this->conn->query($query);
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($rows as $r) {
+                $kondisi = trim($r['kondisi']);
+                if (isset($dist[$kondisi])) {
+                    $dist[$kondisi] = (int)$r['total'];
+                } else {
+                    $dist[$kondisi] = (int)$r['total'];
+                }
+            }
+        } catch (Exception $e) {}
+        return $dist;
+    }
 }

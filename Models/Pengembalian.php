@@ -185,4 +185,50 @@ class Pengembalian {
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         return (float)($row['total_denda'] ?? 0);
     }
+
+    public function getLaporanKasDenda($statusBayar = null, $keyword = null) {
+        $query = "SELECT pg.*, 
+                         p.kode_peminjaman, p.waktu_pinjam, p.waktu_rencana_kembali,
+                         pm.nama as nama_peminjam, pm.nis, pm.kelas, pm.jurusan, pm.no_telp,
+                         u.nama as nama_petugas,
+                         a.nama_alat, a.kode as kode_alat,
+                         dp.jumlah
+                  FROM " . $this->table_name . " pg
+                  JOIN peminjaman p ON pg.id_peminjaman = p.id
+                  JOIN peminjam pm ON p.id_peminjam = pm.id
+                  LEFT JOIN user u ON pg.id_user = u.id_user
+                  LEFT JOIN detail_peminjaman dp ON dp.id_peminjaman = p.id
+                  LEFT JOIN alat a ON dp.id_alat = a.id
+                  WHERE pg.denda > 0";
+
+        if (!empty($keyword)) {
+            $query .= " AND (p.kode_peminjaman LIKE :keyword OR pm.nama LIKE :keyword OR pm.nis LIKE :keyword OR pm.kelas LIKE :keyword)";
+        }
+
+        $query .= " ORDER BY pg.id DESC";
+        $stmt = $this->conn->prepare($query);
+
+        if (!empty($keyword)) {
+            $searchTerm = "%" . $keyword . "%";
+            $stmt->bindParam(':keyword', $searchTerm);
+        }
+
+        $stmt->execute();
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Tambahkan status bayar (default Lunas jika denda telah terekam saat verifikasi pengembalian)
+        foreach ($rows as &$r) {
+            $r['status_bayar'] = isset($r['status_bayar']) ? $r['status_bayar'] : 'Lunas';
+        }
+        return $rows;
+    }
+
+    public function getStatistikDenda() {
+        try {
+            $q = $this->conn->query("SELECT COALESCE(SUM(denda), 0) as total_nominal, COUNT(*) as total_kasus FROM " . $this->table_name . " WHERE denda > 0");
+            return $q->fetch(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            return ['total_nominal' => 0, 'total_kasus' => 0];
+        }
+    }
 }

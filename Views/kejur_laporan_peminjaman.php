@@ -28,11 +28,12 @@ require_once __DIR__ . '/kejur_header.php';
             <h3 class="inventory-title">Catatan Riwayat Peminjaman</h3>
             <p class="inventory-sub">Total <?= count($daftarPeminjaman) ?> transaksi peminjaman tercatat.</p>
         </div>
-        <div style="display: flex; gap: 10px; align-items: center;">
-            <form method="GET" action="index.php" style="margin: 0;">
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <form method="GET" action="index.php" style="margin: 0; display: flex; gap: 8px; flex-wrap: wrap;">
                 <input type="hidden" name="c" value="kejur">
                 <input type="hidden" name="a" value="laporan_peminjaman">
-                <select name="status_filter" class="form-control" style="font-size: 13px; height: 38px; padding: 6px 12px;" onchange="this.form.submit()">
+                
+                <select name="status_filter" class="form-control" style="font-size: 13px; height: 38px; padding: 6px 10px;" onchange="this.form.submit()">
                     <option value="">-- Semua Status --</option>
                     <option value="menunggu" <?= (($_GET['status_filter'] ?? '') === 'menunggu') ? 'selected' : '' ?>>Menunggu</option>
                     <option value="disetujui" <?= (($_GET['status_filter'] ?? '') === 'disetujui') ? 'selected' : '' ?>>Disetujui</option>
@@ -40,6 +41,26 @@ require_once __DIR__ . '/kejur_header.php';
                     <option value="dikembalikan" <?= (($_GET['status_filter'] ?? '') === 'dikembalikan') ? 'selected' : '' ?>>Dikembalikan</option>
                     <option value="ditolak" <?= (($_GET['status_filter'] ?? '') === 'ditolak') ? 'selected' : '' ?>>Ditolak</option>
                 </select>
+
+                <select name="kelas" class="form-control" style="font-size: 13px; height: 38px; padding: 6px 10px;" onchange="this.form.submit()">
+                    <option value="">-- Semua Kelas --</option>
+                    <?php 
+                        $kelasUnik = ['X RPL 1','X RPL 2','X RPL 3','X RPL 4','XI RPL 1','XI RPL 2','XI RPL 3','XI RPL 4','XII RPL 1','XII RPL 2','XII RPL 3','XII RPL 4'];
+                        foreach ($kelasUnik as $kl):
+                    ?>
+                        <option value="<?= $kl ?>" <?= (($_GET['kelas'] ?? '') === $kl) ? 'selected' : '' ?>><?= $kl ?></option>
+                    <?php endforeach; ?>
+                </select>
+
+                <select name="id_alat" class="form-control" style="font-size: 13px; height: 38px; padding: 6px 10px;" onchange="this.form.submit()">
+                    <option value="">-- Semua Alat Lab --</option>
+                    <?php foreach ($daftarAlat as $al): ?>
+                        <option value="<?= $al['id'] ?>" <?= ((int)($_GET['id_alat'] ?? 0) === (int)$al['id']) ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($al['nama_alat']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+
                 <?php if (!empty($_GET['search'])): ?>
                     <input type="hidden" name="search" value="<?= htmlspecialchars($_GET['search']) ?>">
                 <?php endif; ?>
@@ -50,6 +71,12 @@ require_once __DIR__ . '/kejur_header.php';
                 <input type="hidden" name="a" value="laporan_peminjaman">
                 <?php if (!empty($_GET['status_filter'])): ?>
                     <input type="hidden" name="status_filter" value="<?= htmlspecialchars($_GET['status_filter']) ?>">
+                <?php endif; ?>
+                <?php if (!empty($_GET['kelas'])): ?>
+                    <input type="hidden" name="kelas" value="<?= htmlspecialchars($_GET['kelas']) ?>">
+                <?php endif; ?>
+                <?php if (!empty($_GET['id_alat'])): ?>
+                    <input type="hidden" name="id_alat" value="<?= (int)$_GET['id_alat'] ?>">
                 <?php endif; ?>
                 <span class="search-icon">
                     <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">

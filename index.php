@@ -133,8 +133,19 @@ switch ($controller) {
             case 'laporan_peminjaman':
                 $kejur->laporan_peminjaman();
                 break;
+            case 'laporan_denda':
+            case 'laporan_kas_denda':
+                $kejur->laporan_denda();
+                break;
             case 'laporan_pengembalian':
                 $kejur->laporan_pengembalian();
+                break;
+            case 'log':
+            case 'audit_trail':
+                $kejur->log();
+                break;
+            case 'inventaris':
+                $kejur->inventaris();
                 break;
             default:
                 $kejur->dashboard();

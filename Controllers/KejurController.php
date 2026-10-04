@@ -49,7 +49,7 @@ class KejurController {
     }
 
     // ==========================================
-    // 1. DASHBOARD MONITORING KETUA JURUSAN
+    // 1. DASHBOARD MONITORING KETUA JURUSAN (STATISTIK & GRAFIK REAL-TIME)
     // ==========================================
     public function dashboard() {
         $hariArr = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
@@ -61,26 +61,79 @@ class KejurController {
         $totalPeminjaman = count($this->peminjamanModel->getAllPeminjaman());
         $totalPengembalian = count($this->pengembalianModel->getAllPengembalian());
 
-        $peminjamanTerbaru = array_slice($this->peminjamanModel->getAllPeminjaman(), 0, 5);
+        // Counter Ringkasan Real-Time
         $alatAktifDipinjam = $this->peminjamanModel->getActivePeminjaman();
+        $totalAlatSedangDipinjam = 0;
+        foreach ($alatAktifDipinjam as $ap) {
+            $totalAlatSedangDipinjam += (int)($ap['jumlah'] ?? 1);
+        }
+        $totalTerlambat = $this->peminjamanModel->countLatePeminjaman();
+
+        // Grafik 1: Tren Alat Paling Sering Dipinjam
+        $topAlat = $this->alatModel->getTopBorrowedAlat(5);
+
+        // Grafik 2: Status Aset Lab (Pie Chart Persentase Kondisi)
+        $kondisiDist = $this->alatModel->getKondisiDistribution();
+
+        // Rekapitulasi Kas Denda
+        $statDenda = $this->pengembalianModel->getStatistikDenda();
+
+        // Audit Trail Terbaru (5 log terakhir)
+        $auditLogsTerbaru = array_slice($this->userModel->getAllLogs(), 0, 5);
 
         require_once __DIR__ . '/../views/kejur_dashboard.php';
     }
 
     // ==========================================
-    // 2. USE CASE: MELIHAT LAPORAN PEMINJAM
+    // 2. LAPORAN EKSEKUTIF: RIWAYAT PEMINJAMAN
     // ==========================================
-    public function laporan_peminjam() {
+    public function laporan_peminjaman() {
         $keyword = isset($_GET['search']) ? trim($_GET['search']) : '';
-        $daftarPeminjam = $this->peminjamModel->getAllPeminjam($keyword);
+        $statusFilter = isset($_GET['status_filter']) ? trim($_GET['status_filter']) : '';
+        $kelas = isset($_GET['kelas']) ? trim($_GET['kelas']) : '';
+        $idAlat = isset($_GET['id_alat']) ? (int)$_GET['id_alat'] : 0;
 
-        require_once __DIR__ . '/../views/kejur_laporan_peminjam.php';
+        $daftarPeminjaman = $this->peminjamanModel->getAllPeminjaman($keyword, $statusFilter);
+        if (!empty($kelas)) {
+            $daftarPeminjaman = array_values(array_filter($daftarPeminjaman, function($p) use ($kelas) {
+                return ($p['kelas'] ?? '') === $kelas;
+            }));
+        }
+        if ($idAlat > 0) {
+            $daftarPeminjaman = array_values(array_filter($daftarPeminjaman, function($p) use ($idAlat) {
+                return (int)($p['id_alat'] ?? 0) === $idAlat;
+            }));
+        }
+
+        $daftarAlat = $this->alatModel->getAllAlat();
+        require_once __DIR__ . '/../views/kejur_laporan_peminjaman.php';
     }
 
     // ==========================================
-    // 3. USE CASE: MELIHAT LAPORAN ALAT LAB
+    // 2b. LAPORAN EKSEKUTIF: KAS DENDA & SANKSI
     // ==========================================
-    public function laporan_alat() {
+    public function laporan_denda() {
+        $keyword = isset($_GET['search']) ? trim($_GET['search']) : '';
+        $daftarDenda = $this->pengembalianModel->getLaporanKasDenda(null, $keyword);
+        $statDenda = $this->pengembalianModel->getStatistikDenda();
+
+        require_once __DIR__ . '/../views/kejur_laporan_denda.php';
+    }
+
+    // ==========================================
+    // 3. AUDIT TRAIL / LOG AKTIVITAS GLOBAL
+    // ==========================================
+    public function log() {
+        $keyword = isset($_GET['search']) ? trim($_GET['search']) : '';
+        $daftarLog = $this->userModel->getAllLogs($keyword);
+
+        require_once __DIR__ . '/../views/kejur_log.php';
+    }
+
+    // ==========================================
+    // 4. DAFTAR INVENTARIS ALAT LAB (READ-ONLY)
+    // ==========================================
+    public function inventaris() {
         $keyword = isset($_GET['search']) ? trim($_GET['search']) : '';
         $idKategori = isset($_GET['kategori']) ? (int)$_GET['kategori'] : 0;
 
@@ -92,28 +145,23 @@ class KejurController {
         }
         $daftarKategori = $this->kategoriModel->getAllKategori();
 
-        require_once __DIR__ . '/../views/kejur_laporan_alat.php';
+        require_once __DIR__ . '/../views/kejur_inventaris.php';
     }
 
-    // ==========================================
-    // 4. USE CASE: MELIHAT LAPORAN PEMINJAMAN
-    // ==========================================
-    public function laporan_peminjaman() {
+    // Kompatibilitas rute lama laporan
+    public function laporan_peminjam() {
         $keyword = isset($_GET['search']) ? trim($_GET['search']) : '';
-        $statusFilter = isset($_GET['status_filter']) ? trim($_GET['status_filter']) : '';
-
-        $daftarPeminjaman = $this->peminjamanModel->getAllPeminjaman($keyword, $statusFilter);
-
-        require_once __DIR__ . '/../views/kejur_laporan_peminjaman.php';
+        $daftarPeminjam = $this->peminjamModel->getAllPeminjam($keyword);
+        require_once __DIR__ . '/../views/kejur_laporan_peminjam.php';
     }
 
-    // ==========================================
-    // 5. USE CASE: MELIHAT LAPORAN PENGEMBALIAN
-    // ==========================================
+    public function laporan_alat() {
+        $this->inventaris();
+    }
+
     public function laporan_pengembalian() {
         $keyword = isset($_GET['search']) ? trim($_GET['search']) : '';
         $daftarPengembalian = $this->pengembalianModel->getAllPengembalian($keyword);
-
         require_once __DIR__ . '/../views/kejur_laporan_pengembalian.php';
     }
 }
