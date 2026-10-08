@@ -82,7 +82,11 @@ class Pengembalian {
             $stmt->bindParam(':waktu_kembali', $waktu_kembali);
             $stmt->bindParam(':kondisi_kembali', $kondisi_kembali);
             $stmt->bindParam(':denda', $denda);
-            $stmt->bindParam(':id_user', $id_user, PDO::PARAM_INT);
+            if (!empty($id_user) && (int)$id_user > 0) {
+                $stmt->bindValue(':id_user', (int)$id_user, PDO::PARAM_INT);
+            } else {
+                $stmt->bindValue(':id_user', null, PDO::PARAM_NULL);
+            }
             $stmt->execute();
 
             $pengembalianId = $this->conn->lastInsertId();

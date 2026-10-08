@@ -173,6 +173,9 @@ switch ($controller) {
             case 'serahkan_alat':
                 $petugas->serahkan_alat();
                 break;
+            case 'ingatkan_kembali':
+                $petugas->ingatkan_kembali();
+                break;
             case 'pengembalian':
                 $petugas->pengembalian();
                 break;
@@ -211,6 +214,9 @@ switch ($controller) {
                 break;
             case 'batalkan_peminjaman':
                 $peminjam->batalkan_peminjaman();
+                break;
+            case 'kembalikan_alat':
+                $peminjam->kembalikan_alat();
                 break;
             case 'pengembalian':
                 $peminjam->pengembalian();

@@ -136,7 +136,7 @@ require_once __DIR__ . '/peminjam_header.php';
                                     Batalkan
                                 </a>
                             <?php elseif ($status === 'disetujui' || $status === 'dipinjam'): ?>
-                                <button type="button" class="btn-action-edit" style="background: var(--teal-primary); color: white; border: none; font-weight: 600; cursor: pointer; padding: 6px 14px; border-radius: 6px;" onclick='openModalKembalikan(<?= json_encode($p) ?>)'>
+                                <button type="button" class="btn-action-edit" style="background: var(--teal-primary); color: white; border: none; font-weight: 600; cursor: pointer; padding: 6px 14px; border-radius: 6px;" onclick='openModalKembalikan(<?= htmlspecialchars(json_encode($p), ENT_QUOTES, "UTF-8") ?>)'>
                                     Kembalikan
                                 </button>
                             <?php else: ?>
@@ -245,6 +245,8 @@ require_once __DIR__ . '/peminjam_header.php';
             </div>
         </form>
     </div>
+</div>
+
 <!-- MODAL KONFIRMASI KEMBALIKAN ALAT -->
 <div class="modal-overlay" id="modalKembalikanAlat">
     <div class="modal-content">
@@ -254,6 +256,7 @@ require_once __DIR__ . '/peminjam_header.php';
         </div>
         <form method="POST" action="index.php?c=peminjam&a=kembalikan_alat">
             <input type="hidden" name="id_peminjaman" id="kembali_id_peminjaman">
+            <input type="hidden" name="redirect" value="peminjaman">
             
             <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px;">
                 <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 4px;">Perangkat yang Dikembalikan:</div>
@@ -265,23 +268,7 @@ require_once __DIR__ . '/peminjam_header.php';
 
             <div class="form-group">
                 <label class="form-label">Waktu Pengembalian Sekarang</label>
-                <select name="waktu_kembali" class="form-control" required>
-                    <option value="07:10">07.10 (Jam Ke-2)</option>
-                    <option value="07:50">07.50 (Jam Ke-3)</option>
-                    <option value="08:30">08.30 (Jam Ke-4)</option>
-                    <option value="09:10">09.10 (Istirahat)</option>
-                    <option value="10:05">10.05 (Jam Ke-6)</option>
-                    <option value="10:45">10.45 (Jam Ke-7)</option>
-                    <option value="11:25">11.25 (Jam Ke-8)</option>
-                    <option value="12:05">12.05 (Ishoma)</option>
-                    <option value="13:15">13.15 (Jam Ke-10)</option>
-                    <option value="13:55">13.55 (Jam Ke-11)</option>
-                    <option value="14:35">14.35 (Selesai KBM)</option>
-                    <option value="15:15">15.15</option>
-                    <option value="16:00">16.00</option>
-                    <option value="16:30">16.30</option>
-                    <option value="17:00" selected>17.00 (Batas Maksimal Sekolah)</option>
-                </select>
+                <input type="time" name="waktu_kembali" class="form-control" value="<?= date('H:i') ?>" required>
             </div>
 
             <div class="form-group">

@@ -163,6 +163,10 @@ require_once __DIR__ . '/peminjam_header.php';
                                 <a href="index.php?c=peminjam&a=batalkan_peminjaman&id=<?= $p['id'] ?>" class="btn-action-delete" onclick="return confirm('Batalkan pengajuan peminjaman alat ini?')">
                                     Batalkan
                                 </a>
+                            <?php elseif ($status === 'disetujui' || $status === 'dipinjam'): ?>
+                                <button type="button" class="btn-action-edit" style="background: var(--teal-primary); color: white; border: none; font-weight: 600; cursor: pointer; padding: 6px 14px; border-radius: 6px;" onclick='openModalKembalikan(<?= htmlspecialchars(json_encode($p), ENT_QUOTES, "UTF-8") ?>)'>
+                                    Kembalikan
+                                </button>
                             <?php else: ?>
                                 <span style="font-size: 12px; color: var(--text-muted);">-</span>
                             <?php endif; ?>
@@ -173,5 +177,66 @@ require_once __DIR__ . '/peminjam_header.php';
         </tbody>
     </table>
 </section>
+
+<!-- MODAL KONFIRMASI KEMBALIKAN ALAT -->
+<div class="modal-overlay" id="modalKembalikanAlat" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Konfirmasi Pengembalian Alat</h3>
+            <button type="button" class="modal-close" onclick="closeModal('modalKembalikanAlat')">&times;</button>
+        </div>
+        <form method="POST" action="index.php?c=peminjam&a=kembalikan_alat">
+            <input type="hidden" name="id_peminjaman" id="kembali_id_peminjaman">
+            <input type="hidden" name="redirect" value="peminjaman">
+            
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px;">
+                <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 4px;">Perangkat yang Dikembalikan:</div>
+                <div style="font-weight: 700; color: var(--navy-primary); font-size: 15px;" id="kembali_nama_alat">-</div>
+                <div style="font-size: 13px; color: var(--teal-primary); font-weight: 600; margin-top: 2px;">
+                    Kode: <span id="kembali_kode">-</span> | Jumlah: <span id="kembali_jumlah">1</span> Unit
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Waktu Pengembalian Sekarang</label>
+                <input type="time" name="waktu_kembali" class="form-control" value="<?= date('H:i') ?>" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Kondisi Alat Saat Ini</label>
+                <select name="kondisi_kembali" class="form-control" required>
+                    <option value="Baik" selected>Baik (Lengkap & Normal)</option>
+                    <option value="Rusak Ringan">Rusak Ringan</option>
+                    <option value="Rusak Berat">Rusak Berat</option>
+                </select>
+            </div>
+
+            <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-top: 8px;">
+                * Pastikan fisik perangkat laboratorium telah diserahkan langsung ke meja Petugas Lab.
+            </p>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-modal-cancel" onclick="closeModal('modalKembalikanAlat')">Batal</button>
+                <button type="submit" class="btn-modal-submit" style="background: var(--teal-primary);">Konfirmasi Pengembalian</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openModal(id) {
+    document.getElementById(id).style.display = 'flex';
+}
+function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
+}
+function openModalKembalikan(data) {
+    document.getElementById('kembali_id_peminjaman').value = data.id;
+    document.getElementById('kembali_nama_alat').textContent = data.nama_alat;
+    document.getElementById('kembali_kode').textContent = data.kode_peminjaman || data.kode_alat;
+    document.getElementById('kembali_jumlah').textContent = data.jumlah;
+    openModal('modalKembalikanAlat');
+}
+</script>
 
 <?php require_once __DIR__ . '/peminjam_footer.php'; ?>

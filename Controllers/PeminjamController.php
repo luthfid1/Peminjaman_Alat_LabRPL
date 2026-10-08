@@ -248,9 +248,26 @@ class PeminjamController {
         if ($id > 0) {
             try {
                 $pmj = $this->peminjamanModel->getPeminjamanById($id);
-                if ($pmj && (int)$pmj['id_peminjam'] === $idPeminjam && in_array(strtolower($pmj['status']), ['dipinjam', 'disetujui'])) {
-                    // Simpan data pengembalian & pulihkan stok alat
+                // Pastikan peminjaman milik peminjam yang sedang login dan statusnya aktif (disetujui / dipinjam)
+                if ($pmj && ((int)$pmj['id_peminjam'] === $idPeminjam || (!empty($pmj['id_user']) && (int)$pmj['id_user'] === $this->getUserId())) && in_array(strtolower($pmj['status']), ['dipinjam', 'disetujui'])) {
+                    // Hitung denda jika ada keterlambatan atau kerusakan alat
                     $denda = 0;
+                    if (!empty($pmj['waktu_rencana_kembali'])) {
+                        $tKembali = strtotime($waktu_kembali);
+                        $tRencana = strtotime($pmj['waktu_rencana_kembali']);
+                        if ($tKembali > $tRencana) {
+                            $selisihJam = ceil(($tKembali - $tRencana) / 3600);
+                            $denda += ($selisihJam * 5000); // Rp5.000 / jam keterlambatan
+                        }
+                    }
+
+                    if ($kondisi_kembali === 'Rusak Ringan') {
+                        $denda += 20000;
+                    } elseif ($kondisi_kembali === 'Rusak Berat') {
+                        $denda += 50000;
+                    }
+
+                    // Simpan data pengembalian & pulihkan stok alat di database
                     $this->pengembalianModel->createPengembalian($id, $waktu_kembali, $kondisi_kembali, $denda, $this->getUserId());
                     
                     // Tandai notifikasi terkait sebagai dibaca
@@ -259,13 +276,16 @@ class PeminjamController {
                     $this->userModel->recordLog(
                         $this->getUserId(),
                         'Mengembalikan Alat Lab',
-                        "Siswa mengembalikan perangkat #{$pmj['kode_peminjaman']} ({$pmj['nama_alat']})"
+                        "Siswa {$profile['nama']} mengembalikan perangkat #{$pmj['kode_peminjaman']} ({$pmj['nama_alat']})"
                     );
-                    header('Location: index.php?c=peminjam&a=peminjaman&status=returned');
+
+                    $redirect = isset($_POST['redirect']) && $_POST['redirect'] === 'pengembalian' ? 'pengembalian' : 'peminjaman';
+                    header("Location: index.php?c=peminjam&a={$redirect}&status=returned");
                     exit;
                 }
             } catch (Exception $e) {
-                header('Location: index.php?c=peminjam&a=peminjaman&status=error');
+                $redirect = isset($_POST['redirect']) && $_POST['redirect'] === 'pengembalian' ? 'pengembalian' : 'peminjaman';
+                header("Location: index.php?c=peminjam&a={$redirect}&status=error");
                 exit;
             }
         }
@@ -281,8 +301,21 @@ class PeminjamController {
         $idPeminjam = (int)$profile['id'];
         $keyword = isset($_GET['search']) ? trim($_GET['search']) : '';
 
+        $message = '';
+        $error = '';
+        if (isset($_GET['status'])) {
+            if ($_GET['status'] === 'returned') $message = 'Alat laboratorium berhasil dikembalikan! Terima kasih telah menjaga fasilitas lab dengan baik.';
+            if ($_GET['status'] === 'error') $error = 'Terjadi kesalahan sistem saat memproses transaksi pengembalian.';
+        }
+
         $daftarPengembalian = $this->pengembalianModel->getPengembalianByPeminjamId($idPeminjam, $keyword);
         $totalDenda = $this->pengembalianModel->getTotalDendaByPeminjamId($idPeminjam);
+
+        // Ambil peminjaman aktif agar siswa dapat mengembalikan langsung dari halaman pengembalian
+        $semuaPinjaman = $this->peminjamanModel->getPeminjamanByPeminjamId($idPeminjam);
+        $daftarPeminjamanAktif = array_values(array_filter($semuaPinjaman, function($item) {
+            return in_array(strtolower($item['status']), ['disetujui', 'dipinjam']);
+        }));
 
         require_once __DIR__ . '/../views/peminjam_pengembalian.php';
     }
