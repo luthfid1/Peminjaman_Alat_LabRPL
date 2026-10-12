@@ -104,12 +104,19 @@
                     </a>
                 </li>
                 <li>
-                    <a href="index.php?c=petugas&a=pengembalian" class="<?= ($activePage === 'pengembalian') ? 'active' : '' ?>">
-                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <polyline points="1 4 1 10 7 10"></polyline>
-                            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
-                        </svg>
-                        Memantau Pengembalian
+                    <a href="index.php?c=petugas&a=pengembalian" class="<?= ($activePage === 'pengembalian') ? 'active' : '' ?>" style="display: flex; align-items: center; justify-content: space-between;">
+                        <span style="display: flex; align-items: center; gap: 8px;">
+                            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <polyline points="1 4 1 10 7 10"></polyline>
+                                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                            </svg>
+                            Memantau Pengembalian
+                        </span>
+                        <?php if (!empty($totalMenungguKembali) && $totalMenungguKembali > 0): ?>
+                            <span style="background: #ef4444; color: white; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 999px; line-height: 1;">
+                                <?= $totalMenungguKembali ?>
+                            </span>
+                        <?php endif; ?>
                     </a>
                 </li>
                 <li>

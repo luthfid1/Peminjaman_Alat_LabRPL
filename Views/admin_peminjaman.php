@@ -77,6 +77,9 @@ require_once __DIR__ . '/admin_header.php';
 
                     if ($status === 'disetujui' || $status === 'dipinjam') {
                         $statusClass = 'badge-ready';
+                    } elseif ($status === 'menunggu_pengembalian') {
+                        $statusClass = 'badge-busy';
+                        $statusText = 'Menunggu Validasi';
                     } elseif ($status === 'dikembalikan') {
                         $statusClass = 'badge-ready';
                         $statusText = 'Selesai';
@@ -360,6 +363,7 @@ require_once __DIR__ . '/admin_header.php';
                     <option value="menunggu">Menunggu Persetujuan</option>
                     <option value="disetujui">Disetujui</option>
                     <option value="dipinjam">Dipinjam</option>
+                    <option value="menunggu_pengembalian">Menunggu Validasi Pengembalian</option>
                     <option value="dikembalikan">Dikembalikan</option>
                     <option value="ditolak">Ditolak</option>
                 </select>

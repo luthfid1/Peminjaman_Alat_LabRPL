@@ -20,6 +20,29 @@ require_once __DIR__ . '/petugas_header.php';
     </div>
 </div>
 
+<?php if (!empty($totalMenungguKembali) && $totalMenungguKembali > 0): ?>
+    <!-- NOTIFIKASI LANGSUNG PENGAJUAN PENGEMBALIAN DARI SISWA (LANGKAH 2) -->
+    <div style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 2px solid #f59e0b; border-radius: var(--radius-lg, 12px); padding: 18px 22px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);">
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <div style="width: 48px; height: 48px; border-radius: 12px; background: #f59e0b; color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0;">
+                🔔
+            </div>
+            <div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="background: #dc2626; color: white; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.5px;">Pemberitahuan Masuk</span>
+                    <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: #92400e;"><?= $totalMenungguKembali ?> Alat Menunggu Validasi & QC Fisik</h3>
+                </div>
+                <p style="margin: 4px 0 0 0; font-size: 13px; color: #78350f;">
+                    Peminjam telah menekan tombol "Kembalikan Alat". Segera periksa fisik alat di meja lab dan lakukan konfirmasi penerimaan.
+                </p>
+            </div>
+        </div>
+        <a href="index.php?c=petugas&a=pengembalian" class="btn-action-edit" style="background: #0d9488; color: white; border: none; font-weight: 700; padding: 10px 20px; font-size: 13px; text-decoration: none; border-radius: 8px; white-space: nowrap; box-shadow: 0 2px 6px rgba(13, 148, 136, 0.25);">
+            Periksa & Validasi Sekarang &rarr;
+        </a>
+    </div>
+<?php endif; ?>
+
 <!-- 3 KARTU USE CASE PETUGAS -->
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 28px;">
     <!-- KARTU 1: MENYETUJUI PEMINJAMAN -->
@@ -65,9 +88,14 @@ require_once __DIR__ . '/petugas_header.php';
             <div>
                 <span style="font-size: 26px; font-weight: 800; color: var(--primary-navy);"><?= $totalAktif ?></span>
                 <span style="font-size: 12px; color: var(--text-muted); display: block;">Perangkat aktif di luar lab</span>
+                <?php if (!empty($totalMenungguKembali)): ?>
+                    <span style="display: inline-block; font-size: 11px; font-weight: 700; color: #b45309; background: #fef3c7; padding: 2px 8px; border-radius: 4px; margin-top: 4px; border: 1px solid #fde68a;">
+                        ⏳ <?= $totalMenungguKembali ?> menunggu QC fisik
+                    </span>
+                <?php endif; ?>
             </div>
-            <a href="index.php?c=petugas&a=pengembalian" class="btn-action-edit" style="font-size: 12px; text-decoration: none; padding: 6px 12px;">
-                Pantau & Catat &rarr;
+            <a href="index.php?c=petugas&a=pengembalian" class="btn-action-edit" style="font-size: 12px; text-decoration: none; padding: 6px 12px; background: <?= !empty($totalMenungguKembali) ? '#0d9488' : '' ?>; color: <?= !empty($totalMenungguKembali) ? '#fff' : '' ?>;">
+                <?= !empty($totalMenungguKembali) ? 'Validasi QC &rarr;' : 'Pantau & Catat &rarr;' ?>
             </a>
         </div>
     </div>
@@ -230,14 +258,26 @@ require_once __DIR__ . '/petugas_header.php';
                             <?php endif; ?>
                         </td>
                         <td>
-                            <span class="status-badge badge-ready">
-                                <?= ucfirst(htmlspecialchars($pa['status'])) ?>
-                            </span>
+                            <?php if ($pa['status'] === 'menunggu_pengembalian'): ?>
+                                <span class="stock-badge" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a; font-weight:700; padding: 4px 10px; font-size: 12px;">
+                                    ⏳ Menunggu Validasi
+                                </span>
+                            <?php else: ?>
+                                <span class="status-badge badge-ready">
+                                    <?= ucfirst(htmlspecialchars($pa['status'])) ?>
+                                </span>
+                            <?php endif; ?>
                         </td>
                         <td class="table-actions-cell">
-                            <a href="index.php?c=petugas&a=pengembalian" class="btn-action-edit" style="font-size: 12px; text-decoration: none;">
-                                Proses Kembali
-                            </a>
+                            <?php if ($pa['status'] === 'menunggu_pengembalian'): ?>
+                                <a href="index.php?c=petugas&a=pengembalian" class="btn-action-edit" style="font-size: 12px; text-decoration: none; background: #0d9488; color: white; font-weight: 700;">
+                                    🔍 Validasi & QC
+                                </a>
+                            <?php else: ?>
+                                <a href="index.php?c=petugas&a=pengembalian" class="btn-action-edit" style="font-size: 12px; text-decoration: none;">
+                                    Proses Kembali
+                                </a>
+                            <?php endif; ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>

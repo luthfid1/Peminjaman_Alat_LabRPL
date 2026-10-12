@@ -38,6 +38,7 @@ require_once __DIR__ . '/kejur_header.php';
                     <option value="menunggu" <?= (($_GET['status_filter'] ?? '') === 'menunggu') ? 'selected' : '' ?>>Menunggu</option>
                     <option value="disetujui" <?= (($_GET['status_filter'] ?? '') === 'disetujui') ? 'selected' : '' ?>>Disetujui</option>
                     <option value="dipinjam" <?= (($_GET['status_filter'] ?? '') === 'dipinjam') ? 'selected' : '' ?>>Dipinjam</option>
+                    <option value="menunggu_pengembalian" <?= (($_GET['status_filter'] ?? '') === 'menunggu_pengembalian') ? 'selected' : '' ?>>Menunggu Validasi Kembali</option>
                     <option value="dikembalikan" <?= (($_GET['status_filter'] ?? '') === 'dikembalikan') ? 'selected' : '' ?>>Dikembalikan</option>
                     <option value="ditolak" <?= (($_GET['status_filter'] ?? '') === 'ditolak') ? 'selected' : '' ?>>Ditolak</option>
                 </select>
@@ -138,6 +139,8 @@ require_once __DIR__ . '/kejur_header.php';
                                 <span class="stock-badge" style="background:#dcfce7; color:#15803d; padding: 2px 8px; font-size: 11px; font-weight:700;">Disetujui</span>
                             <?php elseif ($status === 'dipinjam'): ?>
                                 <span class="stock-badge stock-badge-available" style="padding: 2px 8px; font-size: 11px;">Dipinjam</span>
+                            <?php elseif ($status === 'menunggu_pengembalian'): ?>
+                                <span class="stock-badge" style="background:#fef3c7; color:#b45309; border: 1px solid #fde68a; font-weight:700; padding: 2px 8px; font-size: 11px;">Menunggu Validasi</span>
                             <?php elseif ($status === 'dikembalikan'): ?>
                                 <span class="stock-badge" style="background:#e0f2fe; color:#0369a1; font-weight:700; padding: 2px 8px; font-size: 11px;">Dikembalikan</span>
                             <?php elseif ($status === 'ditolak'): ?>

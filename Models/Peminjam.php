@@ -12,11 +12,11 @@ class Peminjam {
     }
 
     public function getAllPeminjam($keyword = null) {
-        $query = "SELECT * FROM " . $this->table_name;
+        $query = "SELECT *, id_peminjam as id FROM " . $this->table_name;
         if (!empty($keyword)) {
             $query .= " WHERE nama LIKE :keyword OR nis LIKE :keyword OR kelas LIKE :keyword OR jurusan LIKE :keyword";
         }
-        $query .= " ORDER BY id DESC";
+        $query .= " ORDER BY id_peminjam DESC";
 
         $stmt = $this->conn->prepare($query);
         if (!empty($keyword)) {
@@ -28,7 +28,7 @@ class Peminjam {
     }
 
     public function getPeminjamById($id) {
-        $query = "SELECT * FROM " . $this->table_name . " WHERE id = :id LIMIT 1";
+        $query = "SELECT *, id_peminjam as id FROM " . $this->table_name . " WHERE id_peminjam = :id LIMIT 1";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
@@ -37,7 +37,7 @@ class Peminjam {
 
     public function getPeminjamByUserId($userId) {
         try {
-            $query = "SELECT * FROM " . $this->table_name . " WHERE id_user = :userId LIMIT 1";
+            $query = "SELECT *, id_peminjam as id FROM " . $this->table_name . " WHERE id_user = :userId LIMIT 1";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
             $stmt->execute();
@@ -48,7 +48,7 @@ class Peminjam {
     }
 
     public function getPeminjamByNama($nama) {
-        $query = "SELECT * FROM " . $this->table_name . " WHERE nama = :nama ORDER BY id DESC LIMIT 1";
+        $query = "SELECT *, id_peminjam as id FROM " . $this->table_name . " WHERE nama = :nama ORDER BY id_peminjam DESC LIMIT 1";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':nama', $nama);
         $stmt->execute();
@@ -56,7 +56,7 @@ class Peminjam {
     }
 
     public function getPeminjamByNis($nis) {
-        $query = "SELECT * FROM " . $this->table_name . " WHERE nis = :nis ORDER BY id DESC LIMIT 1";
+        $query = "SELECT *, id_peminjam as id FROM " . $this->table_name . " WHERE nis = :nis ORDER BY id_peminjam DESC LIMIT 1";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':nis', $nis);
         $stmt->execute();
@@ -86,7 +86,6 @@ class Peminjam {
             $stmt->execute();
             return $this->conn->lastInsertId();
         } catch (Exception $e) {
-            // Fallback jika kolom id_user belum tersedia di tabel lama
             $query = "INSERT INTO " . $this->table_name . " (nama, nis, kelas, jurusan, no_telp, `{$colFoto}`) 
                       VALUES (:nama, :nis, :kelas, :jurusan, :no_telp, :foto)";
             $stmt = $this->conn->prepare($query);
@@ -106,13 +105,13 @@ class Peminjam {
             $query = "UPDATE " . $this->table_name . " 
                       SET nama = :nama, nis = :nis, kelas = :kelas, jurusan = :jurusan, 
                           no_telp = :no_telp, foto_kartu_pelajar = :foto_kartu_pelajar 
-                      WHERE id = :id";
+                      WHERE id_peminjam = :id";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':foto_kartu_pelajar', $foto_kartu_pelajar);
         } else {
             $query = "UPDATE " . $this->table_name . " 
                       SET nama = :nama, nis = :nis, kelas = :kelas, jurusan = :jurusan, no_telp = :no_telp 
-                      WHERE id = :id";
+                      WHERE id_peminjam = :id";
             $stmt = $this->conn->prepare($query);
         }
 
@@ -126,7 +125,7 @@ class Peminjam {
     }
 
     public function deletePeminjam($id) {
-        $query = "DELETE FROM " . $this->table_name . " WHERE id = :id";
+        $query = "DELETE FROM " . $this->table_name . " WHERE id_peminjam = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         return $stmt->execute();

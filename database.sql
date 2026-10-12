@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `user` (
 -- 2. Tabel: peminjam
 -- ----------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `peminjam` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `id_peminjam` INT(11) NOT NULL AUTO_INCREMENT,
   `id_user` INT(11) DEFAULT NULL,
   `nama` VARCHAR(100) NOT NULL,
   `nis` VARCHAR(30) NOT NULL,
@@ -32,39 +32,41 @@ CREATE TABLE IF NOT EXISTS `peminjam` (
   `jurusan` VARCHAR(100) NOT NULL,
   `no_telp` VARCHAR(20) DEFAULT NULL,
   `foto_kartu_pelajar` VARCHAR(255) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id_peminjam`),
+  KEY `fk_peminjam_user` (`id_user`),
+  CONSTRAINT `fk_peminjam_user` FOREIGN KEY (`id_user`) REFERENCES `user` (`id_user`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------------------------------------
 -- 3. Tabel: kategori
 -- ----------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `kategori` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `id_kategori` INT(11) NOT NULL AUTO_INCREMENT,
   `nama_kategori` VARCHAR(100) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id_kategori`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------------------------------------
 -- 4. Tabel: alat
 -- ----------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `alat` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `id_alat` INT(11) NOT NULL AUTO_INCREMENT,
   `kode` VARCHAR(50) NOT NULL,
   `id_kategori` INT(11) NOT NULL,
   `nama_alat` VARCHAR(100) NOT NULL,
   `jumlah` INT(11) NOT NULL DEFAULT 0,
   `kondisi` VARCHAR(50) NOT NULL DEFAULT 'Baik',
   `deskripsi` VARCHAR(250) DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`id_alat`),
   KEY `fk_alat_kategori` (`id_kategori`),
-  CONSTRAINT `fk_alat_kategori` FOREIGN KEY (`id_kategori`) REFERENCES `kategori` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `fk_alat_kategori` FOREIGN KEY (`id_kategori`) REFERENCES `kategori` (`id_kategori`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------------------------------------
 -- 5. Tabel: peminjaman (Menggunakan Waktu: TIME)
 -- ----------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `peminjaman` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `id_peminjaman` INT(11) NOT NULL AUTO_INCREMENT,
   `kode_peminjaman` VARCHAR(50) NOT NULL,
   `id_peminjam` INT(11) NOT NULL,
   `id_user` INT(11) DEFAULT NULL,
@@ -74,10 +76,10 @@ CREATE TABLE IF NOT EXISTS `peminjaman` (
   `jenis_peminjaman` VARCHAR(30) DEFAULT 'Praktek Lab',
   `keperluan` TEXT DEFAULT NULL,
   `status` VARCHAR(30) NOT NULL DEFAULT 'menunggu',
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`id_peminjaman`),
   KEY `fk_peminjaman_peminjam` (`id_peminjam`),
   KEY `fk_peminjaman_user` (`id_user`),
-  CONSTRAINT `fk_peminjaman_peminjam` FOREIGN KEY (`id_peminjam`) REFERENCES `peminjam` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_peminjaman_peminjam` FOREIGN KEY (`id_peminjam`) REFERENCES `peminjam` (`id_peminjam`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_peminjaman_user` FOREIGN KEY (`id_user`) REFERENCES `user` (`id_user`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -85,15 +87,15 @@ CREATE TABLE IF NOT EXISTS `peminjaman` (
 -- 6. Tabel: detail_peminjaman
 -- ----------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `detail_peminjaman` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `id_detail_peminjaman` INT(11) NOT NULL AUTO_INCREMENT,
   `id_peminjaman` INT(11) NOT NULL,
   `id_alat` INT(11) NOT NULL,
   `jumlah` INT(11) NOT NULL DEFAULT 1,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`id_detail_peminjaman`),
   KEY `fk_detail_peminjaman` (`id_peminjaman`),
   KEY `fk_detail_alat` (`id_alat`),
-  CONSTRAINT `fk_detail_peminjaman` FOREIGN KEY (`id_peminjaman`) REFERENCES `peminjaman` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_detail_alat` FOREIGN KEY (`id_alat`) REFERENCES `alat` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `fk_detail_peminjaman` FOREIGN KEY (`id_peminjaman`) REFERENCES `peminjaman` (`id_peminjaman`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_detail_alat` FOREIGN KEY (`id_alat`) REFERENCES `alat` (`id_alat`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------------------------------------
@@ -109,7 +111,7 @@ CREATE TABLE IF NOT EXISTS `pengembalian` (
   PRIMARY KEY (`id`),
   KEY `fk_pengembalian_peminjaman` (`id_peminjaman`),
   KEY `fk_pengembalian_user` (`id_user`),
-  CONSTRAINT `fk_pengembalian_peminjaman` FOREIGN KEY (`id_peminjaman`) REFERENCES `peminjaman` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_pengembalian_peminjaman` FOREIGN KEY (`id_peminjaman`) REFERENCES `peminjaman` (`id_peminjaman`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_pengembalian_user` FOREIGN KEY (`id_user`) REFERENCES `user` (`id_user`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -117,12 +119,12 @@ CREATE TABLE IF NOT EXISTS `pengembalian` (
 -- 8. Tabel: log_aktivitas
 -- ----------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `log_aktivitas` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `id_log_aktivitas` INT(11) NOT NULL AUTO_INCREMENT,
   `id_user` INT(11) DEFAULT NULL,
   `aktivitas` VARCHAR(100) NOT NULL,
   `deskripsi` TEXT DEFAULT NULL,
   `waktu` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`id_log_aktivitas`),
   KEY `fk_log_user` (`id_user`),
   CONSTRAINT `fk_log_user` FOREIGN KEY (`id_user`) REFERENCES `user` (`id_user`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -131,16 +133,18 @@ CREATE TABLE IF NOT EXISTS `log_aktivitas` (
 -- 9. Tabel: notifikasi (Pengingat Pengembalian & Notifikasi Sistem)
 -- ----------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `notifikasi` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `id_notifikasi` INT(11) NOT NULL AUTO_INCREMENT,
   `id_peminjam` INT(11) NOT NULL,
   `id_peminjaman` INT(11) NOT NULL,
   `judul` VARCHAR(100) NOT NULL,
   `pesan` TEXT NOT NULL,
   `status` ENUM('belum_dibaca', 'dibaca') NOT NULL DEFAULT 'belum_dibaca',
   `waktu` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`id_notifikasi`),
   KEY `fk_notif_peminjam` (`id_peminjam`),
-  KEY `fk_notif_peminjaman` (`id_peminjaman`)
+  KEY `fk_notif_peminjaman` (`id_peminjaman`),
+  CONSTRAINT `fk_notifikasi_peminjam` FOREIGN KEY (`id_peminjam`) REFERENCES `peminjam` (`id_peminjam`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_notifikasi_peminjaman` FOREIGN KEY (`id_peminjaman`) REFERENCES `peminjaman` (`id_peminjaman`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------------------------------------

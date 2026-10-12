@@ -12,15 +12,15 @@ class Kategori {
     }
 
     public function getAllKategori($keyword = null) {
-        $query = "SELECT k.*, 
-                  (SELECT COUNT(*) FROM alat a WHERE a.id_kategori = k.id) as total_alat 
+        $query = "SELECT k.*, k.id_kategori as id, 
+                  (SELECT COUNT(*) FROM alat a WHERE a.id_kategori = k.id_kategori) as total_alat 
                   FROM " . $this->table_name . " k";
 
         if (!empty($keyword)) {
             $query .= " WHERE k.nama_kategori LIKE :keyword";
         }
 
-        $query .= " ORDER BY k.id DESC";
+        $query .= " ORDER BY k.id_kategori DESC";
         $stmt = $this->conn->prepare($query);
 
         if (!empty($keyword)) {
@@ -33,7 +33,7 @@ class Kategori {
     }
 
     public function getKategoriById($id) {
-        $query = "SELECT * FROM " . $this->table_name . " WHERE id = :id LIMIT 1";
+        $query = "SELECT *, id_kategori as id FROM " . $this->table_name . " WHERE id_kategori = :id LIMIT 1";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
@@ -48,7 +48,7 @@ class Kategori {
     }
 
     public function updateKategori($id, $nama_kategori) {
-        $query = "UPDATE " . $this->table_name . " SET nama_kategori = :nama_kategori WHERE id = :id";
+        $query = "UPDATE " . $this->table_name . " SET nama_kategori = :nama_kategori WHERE id_kategori = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':nama_kategori', $nama_kategori);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
@@ -56,7 +56,7 @@ class Kategori {
     }
 
     public function deleteKategori($id) {
-        $query = "DELETE FROM " . $this->table_name . " WHERE id = :id";
+        $query = "DELETE FROM " . $this->table_name . " WHERE id_kategori = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         return $stmt->execute();

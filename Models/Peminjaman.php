@@ -16,7 +16,7 @@ class Peminjaman {
         try {
             $query = "SELECT kode_peminjaman FROM " . $this->table_name . " 
                       WHERE kode_peminjaman LIKE :prefix 
-                      ORDER BY id DESC LIMIT 1";
+                      ORDER BY id_peminjaman DESC LIMIT 1";
             $stmt = $this->conn->prepare($query);
             $p = $prefix . "%";
             $stmt->bindParam(':prefix', $p);
@@ -36,18 +36,18 @@ class Peminjaman {
     }
 
     public function getAllPeminjaman($keyword = null, $statusFilter = null) {
-        $query = "SELECT p.*, 
+        $query = "SELECT p.*, p.id_peminjaman as id,
                          pm.nama as nama_peminjam, pm.nis, pm.kelas, pm.jurusan, pm.no_telp, pm.foto_kartu_pelajar,
                          u.nama as nama_petugas,
                          dp.id_alat, dp.jumlah,
                          a.nama_alat, a.kode as kode_alat,
                          k.nama_kategori
                   FROM " . $this->table_name . " p
-                  LEFT JOIN peminjam pm ON p.id_peminjam = pm.id
+                  LEFT JOIN peminjam pm ON p.id_peminjam = pm.id_peminjam
                   LEFT JOIN user u ON p.id_user = u.id_user
-                  LEFT JOIN detail_peminjaman dp ON dp.id_peminjaman = p.id
-                  LEFT JOIN alat a ON dp.id_alat = a.id
-                  LEFT JOIN kategori k ON a.id_kategori = k.id
+                  LEFT JOIN detail_peminjaman dp ON dp.id_peminjaman = p.id_peminjaman
+                  LEFT JOIN alat a ON dp.id_alat = a.id_alat
+                  LEFT JOIN kategori k ON a.id_kategori = k.id_kategori
                   WHERE 1=1";
 
         if (!empty($statusFilter)) {
@@ -62,7 +62,7 @@ class Peminjaman {
                         OR p.keperluan LIKE :keyword)";
         }
 
-        $query .= " ORDER BY p.id DESC";
+        $query .= " ORDER BY p.id_peminjaman DESC";
 
         $stmt = $this->conn->prepare($query);
 
@@ -80,19 +80,19 @@ class Peminjaman {
     }
 
     public function getPeminjamanById($id) {
-        $query = "SELECT p.*, 
+        $query = "SELECT p.*, p.id_peminjaman as id,
                          pm.nama as nama_peminjam, pm.nis, pm.kelas, pm.jurusan, pm.no_telp, pm.foto_kartu_pelajar,
                          u.nama as nama_petugas,
                          dp.id_alat, dp.jumlah,
                          a.nama_alat, a.kode as kode_alat,
                          k.nama_kategori
                   FROM " . $this->table_name . " p
-                  LEFT JOIN peminjam pm ON p.id_peminjam = pm.id
+                  LEFT JOIN peminjam pm ON p.id_peminjam = pm.id_peminjam
                   LEFT JOIN user u ON p.id_user = u.id_user
-                  LEFT JOIN detail_peminjaman dp ON dp.id_peminjaman = p.id
-                  LEFT JOIN alat a ON dp.id_alat = a.id
-                  LEFT JOIN kategori k ON a.id_kategori = k.id
-                  WHERE p.id = :id
+                  LEFT JOIN detail_peminjaman dp ON dp.id_peminjaman = p.id_peminjaman
+                  LEFT JOIN alat a ON dp.id_alat = a.id_alat
+                  LEFT JOIN kategori k ON a.id_kategori = k.id_kategori
+                  WHERE p.id_peminjaman = :id
                   LIMIT 1";
 
         $stmt = $this->conn->prepare($query);
@@ -130,9 +130,8 @@ class Peminjaman {
             $stmtDetail->bindParam(':jumlah', $jumlah, PDO::PARAM_INT);
             $stmtDetail->execute();
 
-            // Kurangi stok jika status disetujui atau dipinjam
             if (in_array(strtolower($status), ['disetujui', 'dipinjam'])) {
-                $queryStock = "UPDATE alat SET jumlah = GREATEST(0, jumlah - :jumlah) WHERE id = :id_alat";
+                $queryStock = "UPDATE alat SET jumlah = GREATEST(0, jumlah - :jumlah) WHERE id_alat = :id_alat";
                 $stmtStock = $this->conn->prepare($queryStock);
                 $stmtStock->bindParam(':jumlah', $jumlah, PDO::PARAM_INT);
                 $stmtStock->bindParam(':id_alat', $id_alat, PDO::PARAM_INT);
@@ -154,7 +153,7 @@ class Peminjaman {
                       SET id_peminjam = :id_peminjam, waktu_pinjam = :waktu_pinjam, 
                           waktu_rencana_kembali = :waktu_rencana, jenis_peminjaman = :jenis, 
                           keperluan = :keperluan, status = :status 
-                      WHERE id = :id";
+                      WHERE id_peminjaman = :id";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':id_peminjam', $id_peminjam, PDO::PARAM_INT);
             $stmt->bindParam(':waktu_pinjam', $waktu_pinjam);
@@ -197,7 +196,7 @@ class Peminjaman {
             if ($id_user !== null) {
                 $query .= ", id_user = :id_user";
             }
-            $query .= " WHERE id = :id";
+            $query .= " WHERE id_peminjaman = :id";
 
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':status', $status);
@@ -207,16 +206,14 @@ class Peminjaman {
             $stmt->bindParam(':id', $id, PDO::PARAM_INT);
             $stmt->execute();
 
-            // Atur stok berdasarkan transisi status
-            if (!in_array($oldStatus, ['disetujui', 'dipinjam']) && in_array($newStatus, ['disetujui', 'dipinjam'])) {
-                // Kurangi stok
-                $st = $this->conn->prepare("UPDATE alat SET jumlah = GREATEST(0, jumlah - :jml) WHERE id = :id_alat");
+            $borrowedStatuses = ['disetujui', 'dipinjam', 'menunggu_pengembalian', 'menunggu_validasi'];
+            if (!in_array($oldStatus, $borrowedStatuses) && in_array($newStatus, $borrowedStatuses)) {
+                $st = $this->conn->prepare("UPDATE alat SET jumlah = GREATEST(0, jumlah - :jml) WHERE id_alat = :id_alat");
                 $st->bindParam(':jml', $current['jumlah'], PDO::PARAM_INT);
                 $st->bindParam(':id_alat', $current['id_alat'], PDO::PARAM_INT);
                 $st->execute();
-            } elseif (in_array($oldStatus, ['disetujui', 'dipinjam']) && in_array($newStatus, ['ditolak', 'dikembalikan', 'dibatalkan'])) {
-                // Kembalikan stok
-                $st = $this->conn->prepare("UPDATE alat SET jumlah = jumlah + :jml WHERE id = :id_alat");
+            } elseif (in_array($oldStatus, $borrowedStatuses) && in_array($newStatus, ['ditolak', 'dikembalikan', 'dibatalkan'])) {
+                $st = $this->conn->prepare("UPDATE alat SET jumlah = jumlah + :jml WHERE id_alat = :id_alat");
                 $st->bindParam(':jml', $current['jumlah'], PDO::PARAM_INT);
                 $st->bindParam(':id_alat', $current['id_alat'], PDO::PARAM_INT);
                 $st->execute();
@@ -236,8 +233,8 @@ class Peminjaman {
 
         $this->conn->beginTransaction();
         try {
-            if (in_array(strtolower($current['status']), ['disetujui', 'dipinjam'])) {
-                $st = $this->conn->prepare("UPDATE alat SET jumlah = jumlah + :jml WHERE id = :id_alat");
+            if (in_array(strtolower($current['status']), ['disetujui', 'dipinjam', 'menunggu_pengembalian', 'menunggu_validasi'])) {
+                $st = $this->conn->prepare("UPDATE alat SET jumlah = jumlah + :jml WHERE id_alat = :id_alat");
                 $st->bindParam(':jml', $current['jumlah'], PDO::PARAM_INT);
                 $st->bindParam(':id_alat', $current['id_alat'], PDO::PARAM_INT);
                 $st->execute();
@@ -247,7 +244,7 @@ class Peminjaman {
             $delDetail->bindParam(':id', $id, PDO::PARAM_INT);
             $delDetail->execute();
 
-            $del = $this->conn->prepare("DELETE FROM " . $this->table_name . " WHERE id = :id");
+            $del = $this->conn->prepare("DELETE FROM " . $this->table_name . " WHERE id_peminjaman = :id");
             $del->bindParam(':id', $id, PDO::PARAM_INT);
             $del->execute();
 
@@ -260,34 +257,80 @@ class Peminjaman {
     }
 
     public function getActivePeminjaman() {
-        $query = "SELECT p.*, 
-                         pm.nama as nama_peminjam, pm.nis, pm.kelas, pm.jurusan,
+        $query = "SELECT p.*, p.id_peminjaman as id,
+                         pm.nama as nama_peminjam, pm.nis, pm.kelas, pm.jurusan, pm.no_telp,
                          dp.id_alat, dp.jumlah,
-                         a.nama_alat, a.kode as kode_alat
+                         a.nama_alat, a.kode as kode_alat,
+                         k.nama_kategori
                   FROM " . $this->table_name . " p
-                  JOIN peminjam pm ON p.id_peminjam = pm.id
-                  JOIN detail_peminjaman dp ON dp.id_peminjaman = p.id
-                  JOIN alat a ON dp.id_alat = a.id
-                  WHERE p.status IN ('disetujui', 'dipinjam')
-                  ORDER BY p.id DESC";
+                  JOIN peminjam pm ON p.id_peminjam = pm.id_peminjam
+                  JOIN detail_peminjaman dp ON dp.id_peminjaman = p.id_peminjaman
+                  JOIN alat a ON dp.id_alat = a.id_alat
+                  LEFT JOIN kategori k ON a.id_kategori = k.id_kategori
+                  WHERE p.status IN ('disetujui', 'dipinjam', 'menunggu_pengembalian', 'menunggu_validasi')
+                  ORDER BY p.id_peminjaman DESC";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function getMenungguPengembalian($keyword = null) {
+        $query = "SELECT p.*, p.id_peminjaman as id,
+                         pm.nama as nama_peminjam, pm.nis, pm.kelas, pm.jurusan, pm.no_telp, pm.foto_kartu_pelajar,
+                         u.nama as nama_petugas,
+                         dp.id_alat, dp.jumlah,
+                         a.nama_alat, a.kode as kode_alat,
+                         k.nama_kategori
+                  FROM " . $this->table_name . " p
+                  JOIN peminjam pm ON p.id_peminjam = pm.id_peminjam
+                  LEFT JOIN user u ON p.id_user = u.id_user
+                  JOIN detail_peminjaman dp ON dp.id_peminjaman = p.id_peminjaman
+                  JOIN alat a ON dp.id_alat = a.id_alat
+                  LEFT JOIN kategori k ON a.id_kategori = k.id_kategori
+                  WHERE p.status IN ('menunggu_pengembalian', 'menunggu_validasi')";
+
+        if (!empty($keyword)) {
+            $query .= " AND (p.kode_peminjaman LIKE :keyword 
+                        OR pm.nama LIKE :keyword 
+                        OR pm.nis LIKE :keyword 
+                        OR a.nama_alat LIKE :keyword)";
+        }
+
+        $query .= " ORDER BY p.id_peminjaman DESC";
+        $stmt = $this->conn->prepare($query);
+
+        if (!empty($keyword)) {
+            $searchTerm = "%" . $keyword . "%";
+            $stmt->bindParam(':keyword', $searchTerm);
+        }
+
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function ajukanPengembalianByPeminjam($id, $idPeminjam) {
+        $query = "UPDATE " . $this->table_name . " 
+                  SET status = 'menunggu_validasi' 
+                  WHERE id_peminjaman = :id AND id_peminjam = :idPeminjam AND status IN ('disetujui', 'dipinjam')";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->bindParam(':idPeminjam', $idPeminjam, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+
     public function getPeminjamanByPeminjamId($idPeminjam, $keyword = null, $statusFilter = null) {
-        $query = "SELECT p.*, 
+        $query = "SELECT p.*, p.id_peminjaman as id,
                          pm.nama as nama_peminjam, pm.nis, pm.kelas, pm.jurusan,
                          u.nama as nama_petugas,
                          dp.id_alat, dp.jumlah,
                          a.nama_alat, a.kode as kode_alat,
                          k.nama_kategori
                   FROM " . $this->table_name . " p
-                  JOIN peminjam pm ON p.id_peminjam = pm.id
+                  JOIN peminjam pm ON p.id_peminjam = pm.id_peminjam
                   LEFT JOIN user u ON p.id_user = u.id_user
-                  LEFT JOIN detail_peminjaman dp ON dp.id_peminjaman = p.id
-                  LEFT JOIN alat a ON dp.id_alat = a.id
-                  LEFT JOIN kategori k ON a.id_kategori = k.id
+                  LEFT JOIN detail_peminjaman dp ON dp.id_peminjaman = p.id_peminjaman
+                  LEFT JOIN alat a ON dp.id_alat = a.id_alat
+                  LEFT JOIN kategori k ON a.id_kategori = k.id_kategori
                   WHERE p.id_peminjam = :idPeminjam";
 
         if (!empty($statusFilter)) {
@@ -300,7 +343,7 @@ class Peminjaman {
                         OR p.keperluan LIKE :keyword)";
         }
 
-        $query .= " ORDER BY p.id DESC";
+        $query .= " ORDER BY p.id_peminjaman DESC";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':idPeminjam', $idPeminjam, PDO::PARAM_INT);
 
@@ -340,7 +383,7 @@ class Peminjaman {
     public function batalkanPeminjamanByPeminjam($id, $idPeminjam) {
         $query = "UPDATE " . $this->table_name . " 
                   SET status = 'dibatalkan' 
-                  WHERE id = :id AND id_peminjam = :idPeminjam AND status = 'menunggu'";
+                  WHERE id_peminjaman = :id AND id_peminjam = :idPeminjam AND status = 'menunggu'";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->bindParam(':idPeminjam', $idPeminjam, PDO::PARAM_INT);
@@ -351,8 +394,8 @@ class Peminjaman {
         try {
             $currentTime = date('H:i:s');
             $query = "SELECT COUNT(*) as total FROM " . $this->table_name . " 
-                      WHERE status IN ('disetujui', 'dipinjam') 
-                      AND waktu_rencana_kembali < :currentTime";
+                       WHERE status IN ('disetujui', 'dipinjam', 'menunggu_pengembalian', 'menunggu_validasi') 
+                       AND waktu_rencana_kembali < :currentTime";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':currentTime', $currentTime);
             $stmt->execute();
@@ -364,18 +407,18 @@ class Peminjaman {
     }
 
     public function getExecutivePeminjaman($startDate = null, $endDate = null, $kelas = null, $idAlat = null, $keyword = null) {
-        $query = "SELECT p.*, 
+        $query = "SELECT p.*, p.id_peminjaman as id,
                          pm.nama as nama_peminjam, pm.nis, pm.kelas, pm.jurusan, pm.no_telp,
                          u.nama as nama_petugas,
                          dp.id_alat, dp.jumlah,
                          a.nama_alat, a.kode as kode_alat,
                          k.nama_kategori
                   FROM " . $this->table_name . " p
-                  JOIN peminjam pm ON p.id_peminjam = pm.id
+                  JOIN peminjam pm ON p.id_peminjam = pm.id_peminjam
                   LEFT JOIN user u ON p.id_user = u.id_user
-                  LEFT JOIN detail_peminjaman dp ON dp.id_peminjaman = p.id
-                  LEFT JOIN alat a ON dp.id_alat = a.id
-                  LEFT JOIN kategori k ON a.id_kategori = k.id
+                  LEFT JOIN detail_peminjaman dp ON dp.id_peminjaman = p.id_peminjaman
+                  LEFT JOIN alat a ON dp.id_alat = a.id_alat
+                  LEFT JOIN kategori k ON a.id_kategori = k.id_kategori
                   WHERE 1=1";
 
         if (!empty($kelas)) {
@@ -388,7 +431,7 @@ class Peminjaman {
             $query .= " AND (p.kode_peminjaman LIKE :keyword OR pm.nama LIKE :keyword OR a.nama_alat LIKE :keyword)";
         }
 
-        $query .= " ORDER BY p.id DESC";
+        $query .= " ORDER BY p.id_peminjaman DESC";
         $stmt = $this->conn->prepare($query);
 
         if (!empty($kelas)) {

@@ -64,7 +64,7 @@ require_once 'Views/peminjam_header.php';
                         </p>
                     </div>
 
-                    <a href="index.php?c=peminjam&a=katalog&kategori=<?= $kat['id_kategori'] ?>" 
+                    <a href="index.php?c=peminjam&a=katalog&kategori=<?= $kat['id'] ?? ($kat['id_kategori'] ?? '') ?>" 
                        style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none; color: #0f766e; background: #ccfbf1; border: 1px solid #99f6e4; transition: all 0.15s ease;">
                         <span>Lihat Alat Musik</span>
                         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">

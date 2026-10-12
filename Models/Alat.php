@@ -12,15 +12,15 @@ class Alat {
     }
 
     public function getAllAlat($keyword = null) {
-        $query = "SELECT a.*, k.nama_kategori 
+        $query = "SELECT a.*, a.id_alat as id, k.nama_kategori 
                   FROM " . $this->table_name . " a 
-                  LEFT JOIN kategori k ON a.id_kategori = k.id";
+                  LEFT JOIN kategori k ON a.id_kategori = k.id_kategori";
 
         if (!empty($keyword)) {
             $query .= " WHERE a.nama_alat LIKE :keyword OR a.kode LIKE :keyword OR k.nama_kategori LIKE :keyword OR a.kondisi LIKE :keyword";
         }
 
-        $query .= " ORDER BY a.id DESC";
+        $query .= " ORDER BY a.id_alat DESC";
         $stmt = $this->conn->prepare($query);
 
         if (!empty($keyword)) {
@@ -33,10 +33,10 @@ class Alat {
     }
 
     public function getAlatById($id) {
-        $query = "SELECT a.*, k.nama_kategori 
+        $query = "SELECT a.*, a.id_alat as id, k.nama_kategori 
                   FROM " . $this->table_name . " a 
-                  LEFT JOIN kategori k ON a.id_kategori = k.id 
-                  WHERE a.id = :id 
+                  LEFT JOIN kategori k ON a.id_kategori = k.id_kategori 
+                  WHERE a.id_alat = :id 
                   LIMIT 1";
 
         $stmt = $this->conn->prepare($query);
@@ -63,7 +63,7 @@ class Alat {
         $query = "UPDATE " . $this->table_name . " 
                   SET kode = :kode, id_kategori = :id_kategori, nama_alat = :nama_alat, 
                       jumlah = :jumlah, kondisi = :kondisi, deskripsi = :deskripsi 
-                  WHERE id = :id";
+                  WHERE id_alat = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':kode', $kode);
         $stmt->bindParam(':id_kategori', $id_kategori, PDO::PARAM_INT);
@@ -76,7 +76,7 @@ class Alat {
     }
 
     public function deleteAlat($id) {
-        $query = "DELETE FROM " . $this->table_name . " WHERE id = :id";
+        $query = "DELETE FROM " . $this->table_name . " WHERE id_alat = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         return $stmt->execute();
@@ -97,7 +97,7 @@ class Alat {
             $q2 = $this->conn->query("SELECT COUNT(*) as total FROM kategori");
             $stats['total_kategori'] = (int)($q2->fetch(PDO::FETCH_ASSOC)['total'] ?? 0);
 
-            $q3 = $this->conn->query("SELECT COUNT(*) as total FROM peminjaman WHERE status = 'disetujui' OR status = 'dipinjam'");
+            $q3 = $this->conn->query("SELECT COUNT(*) as total FROM peminjaman WHERE status IN ('disetujui', 'dipinjam', 'menunggu_pengembalian', 'menunggu_validasi')");
             $stats['sedang_dipinjam'] = (int)($q3->fetch(PDO::FETCH_ASSOC)['total'] ?? 0);
 
             $q4 = $this->conn->query("SELECT COUNT(*) as total FROM peminjaman WHERE status = 'menunggu'");
@@ -111,10 +111,10 @@ class Alat {
         try {
             $query = "SELECT a.nama_alat, a.kode, COALESCE(SUM(dp.jumlah), 0) as total_pinjam
                       FROM detail_peminjaman dp
-                      JOIN alat a ON dp.id_alat = a.id
-                      JOIN peminjaman p ON dp.id_peminjaman = p.id
-                      WHERE p.status IN ('disetujui', 'dipinjam', 'dikembalikan')
-                      GROUP BY a.id, a.nama_alat, a.kode
+                      JOIN alat a ON dp.id_alat = a.id_alat
+                      JOIN peminjaman p ON dp.id_peminjaman = p.id_peminjaman
+                      WHERE p.status IN ('disetujui', 'dipinjam', 'menunggu_pengembalian', 'menunggu_validasi', 'dikembalikan')
+                      GROUP BY a.id_alat, a.nama_alat, a.kode
                       ORDER BY total_pinjam DESC
                       LIMIT :limit";
             $stmt = $this->conn->prepare($query);
@@ -128,7 +128,7 @@ class Alat {
 
         // Fallback jika belum ada transaksi: ambil alat teratas
         try {
-            $q = $this->conn->query("SELECT nama_alat, kode, 0 as total_pinjam FROM alat ORDER BY id ASC LIMIT 5");
+            $q = $this->conn->query("SELECT nama_alat, kode, 0 as total_pinjam FROM alat ORDER BY id_alat ASC LIMIT 5");
             return $q->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
             return [];

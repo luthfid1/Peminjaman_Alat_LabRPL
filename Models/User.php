@@ -125,13 +125,13 @@ class User {
     }
 
     public function getAllLogs($keyword = null) {
-        $query = "SELECT l.*, u.nama as nama_user, u.username, u.role 
+        $query = "SELECT l.*, l.id_log_aktivitas as id, u.nama as nama_user, u.username, u.role 
                   FROM log_aktivitas l 
                   LEFT JOIN " . $this->table_name . " u ON l.id_user = u.id_user";
         if (!empty($keyword)) {
             $query .= " WHERE l.aktivitas LIKE :keyword OR l.deskripsi LIKE :keyword OR u.nama LIKE :keyword OR u.username LIKE :keyword";
         }
-        $query .= " ORDER BY l.id DESC LIMIT 100";
+        $query .= " ORDER BY l.id_log_aktivitas DESC LIMIT 100";
 
         $stmt = $this->conn->prepare($query);
         if (!empty($keyword)) {

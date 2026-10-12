@@ -116,6 +116,11 @@ require_once __DIR__ . '/peminjam_header.php';
                                 <?php if ($isReminded): ?>
                                     <div style="font-size: 11px; color: #b45309; font-weight: 700; margin-top: 4px;">🔔 Diminta Segera Kembali</div>
                                 <?php endif; ?>
+                            <?php elseif ($status === 'menunggu_pengembalian' || $status === 'menunggu_validasi'): ?>
+                                <span class="stock-badge" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a; font-weight:700; padding: 4px 10px; font-size: 12px;">
+                                    ⏳ Menunggu Validasi Petugas
+                                </span>
+                                <div style="font-size: 11px; color: #92400e; margin-top: 3px;">Fisik diserahkan ke meja lab</div>
                             <?php elseif ($status === 'dikembalikan'): ?>
                                 <span class="stock-badge" style="background:#e0f2fe; color:#0369a1; font-weight:700; padding: 4px 10px; font-size: 12px;">
                                     ✅ Selesai Dikembalikan
@@ -136,9 +141,17 @@ require_once __DIR__ . '/peminjam_header.php';
                                     Batalkan
                                 </a>
                             <?php elseif ($status === 'disetujui' || $status === 'dipinjam'): ?>
-                                <button type="button" class="btn-action-edit" style="background: var(--teal-primary); color: white; border: none; font-weight: 600; cursor: pointer; padding: 6px 14px; border-radius: 6px;" onclick='openModalKembalikan(<?= htmlspecialchars(json_encode($p), ENT_QUOTES, "UTF-8") ?>)'>
-                                    Kembalikan
+                                <button type="button" class="btn-action-return" onclick='openModalKembalikan(<?= htmlspecialchars(json_encode($p), ENT_QUOTES, "UTF-8") ?>)'>
+                                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                        <polyline points="1 4 1 10 7 10"></polyline>
+                                        <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                                    </svg>
+                                    Kembalikan Alat
                                 </button>
+                            <?php elseif ($status === 'menunggu_pengembalian' || $status === 'menunggu_validasi'): ?>
+                                <span style="font-size: 12px; color: #b45309; font-weight: 700; background: #fffbeb; padding: 4px 10px; border-radius: 6px; border: 1px dashed #f59e0b; display: inline-block;">
+                                    🔍 Menunggu QC Petugas
+                                </span>
                             <?php else: ?>
                                 <span style="font-size: 12px; color: var(--text-muted);">-</span>
                             <?php endif; ?>
@@ -249,44 +262,42 @@ require_once __DIR__ . '/peminjam_header.php';
 
 <!-- MODAL KONFIRMASI KEMBALIKAN ALAT -->
 <div class="modal-overlay" id="modalKembalikanAlat">
-    <div class="modal-content">
+    <div class="modal-content" style="max-width: 500px;">
         <div class="modal-header">
-            <h3 class="modal-title">Konfirmasi Pengembalian Alat</h3>
+            <h3 class="modal-title">Ajukan Pengembalian Alat Lab</h3>
             <button type="button" class="modal-close" onclick="closeModal('modalKembalikanAlat')">&times;</button>
         </div>
         <form method="POST" action="index.php?c=peminjam&a=kembalikan_alat">
             <input type="hidden" name="id_peminjaman" id="kembali_id_peminjaman">
             <input type="hidden" name="redirect" value="peminjaman">
             
+            <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 12px 14px; margin-bottom: 16px; font-size: 12px; color: #92400e; line-height: 1.5;">
+                <div style="font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    Wajib Validasi Fisik oleh Petugas Lab (Toolman)
+                </div>
+                Pengembalian ini akan berstatus <strong>Menunggu Validasi Petugas</strong>. Fisik perangkat <strong>wajib diserahkan langsung ke Petugas Lab</strong> untuk pemeriksaan kondisi (Quality Control). Waktu pengembalian, status akhir, dan pemulihan stok hanya akan berlaku setelah Petugas memvalidasi barang di meja lab.
+            </div>
+
             <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px;">
-                <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 4px;">Perangkat yang Dikembalikan:</div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Perangkat yang Diajukan Kembali:</div>
                 <div style="font-weight: 700; color: var(--navy-primary); font-size: 15px;" id="kembali_nama_alat">-</div>
-                <div style="font-size: 13px; color: var(--teal-primary); font-weight: 600; margin-top: 2px;">
-                    Kode: <span id="kembali_kode">-</span> | Jumlah: <span id="kembali_jumlah">1</span> Unit
+                <div style="font-size: 12px; color: var(--teal-primary); font-weight: 600; margin-top: 2px;">
+                    Kode: <span id="kembali_kode">-</span> &bull; Jumlah: <span id="kembali_jumlah">1</span> Unit
+                </div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
+                    Tenggat Rencana: <span id="kembali_rencana" style="font-weight: 600; color: #0f766e;">-</span>
                 </div>
             </div>
 
             <div class="form-group">
-                <label class="form-label">Waktu Pengembalian Sekarang</label>
-                <input type="time" name="waktu_kembali" class="form-control" value="<?= date('H:i') ?>" required>
+                <label class="form-label">Catatan Penyerahan Siswa <span style="font-size: 11px; color: var(--text-muted); font-weight: 400;">(Opsional)</span></label>
+                <textarea name="catatan_siswa" class="form-control" rows="2" placeholder="Contoh: Alat sudah diserahkan di meja lab komputer / laboran"></textarea>
             </div>
-
-            <div class="form-group">
-                <label class="form-label">Kondisi Alat Saat Ini</label>
-                <select name="kondisi_kembali" class="form-control" required>
-                    <option value="Baik" selected>Baik (Lengkap & Normal)</option>
-                    <option value="Rusak Ringan">Rusak Ringan</option>
-                    <option value="Rusak Berat">Rusak Berat</option>
-                </select>
-            </div>
-
-            <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-top: 8px;">
-                * Pastikan fisik perangkat laboratorium telah diserahkan langsung ke meja Petugas Lab.
-            </p>
 
             <div class="modal-footer">
                 <button type="button" class="btn-modal-cancel" onclick="closeModal('modalKembalikanAlat')">Batal</button>
-                <button type="submit" class="btn-modal-submit" style="background: var(--teal-primary);">Konfirmasi Pengembalian</button>
+                <button type="submit" class="btn-modal-submit" style="background: var(--teal-primary);">Ajukan Pengembalian ke Petugas</button>
             </div>
         </form>
     </div>
@@ -304,6 +315,7 @@ function openModalKembalikan(data) {
     document.getElementById('kembali_nama_alat').textContent = data.nama_alat;
     document.getElementById('kembali_kode').textContent = data.kode_peminjaman || data.kode_alat;
     document.getElementById('kembali_jumlah').textContent = data.jumlah;
+    document.getElementById('kembali_rencana').textContent = (data.waktu_rencana_kembali ? data.waktu_rencana_kembali.substring(0, 5) + ' WIB' : '-');
     openModal('modalKembalikanAlat');
 }
 function updateMaxStok() {

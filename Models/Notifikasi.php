@@ -28,14 +28,14 @@ class Notifikasi {
 
     public function getNotifikasiByPeminjam($idPeminjam, $onlyUnread = false) {
         try {
-            $query = "SELECT n.*, p.kode_peminjaman 
+            $query = "SELECT n.*, n.id_notifikasi as id, p.kode_peminjaman 
                       FROM " . $this->table_name . " n
-                      LEFT JOIN peminjaman p ON n.id_peminjaman = p.id
+                      LEFT JOIN peminjaman p ON n.id_peminjaman = p.id_peminjaman
                       WHERE n.id_peminjam = :idPeminjam";
             if ($onlyUnread) {
                 $query .= " AND n.status = 'belum_dibaca'";
             }
-            $query .= " ORDER BY n.id DESC";
+            $query .= " ORDER BY n.id_notifikasi DESC";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':idPeminjam', $idPeminjam, PDO::PARAM_INT);
             $stmt->execute();
@@ -71,7 +71,7 @@ class Notifikasi {
 
     public function hasUnreadReminder($idPeminjaman) {
         try {
-            $query = "SELECT id FROM " . $this->table_name . " 
+            $query = "SELECT id_notifikasi FROM " . $this->table_name . " 
                       WHERE id_peminjaman = :idPeminjaman AND status = 'belum_dibaca' LIMIT 1";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':idPeminjaman', $idPeminjaman, PDO::PARAM_INT);

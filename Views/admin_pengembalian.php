@@ -134,7 +134,7 @@ require_once __DIR__ . '/admin_header.php';
                     <?php else: ?>
                         <?php foreach ($peminjamanAktif as $pa): ?>
                             <option value="<?= $pa['id'] ?>">
-                                [<?= htmlspecialchars($pa['kode_peminjaman']) ?>] <?= htmlspecialchars($pa['nama_peminjam']) ?> - <?= htmlspecialchars($pa['nama_alat']) ?> (<?= $pa['jumlah'] ?> unit)
+                                [<?= htmlspecialchars($pa['kode_peminjaman']) ?>] <?= htmlspecialchars($pa['nama_peminjam']) ?> - <?= htmlspecialchars($pa['nama_alat']) ?> (<?= $pa['jumlah'] ?> unit) <?= ($pa['status'] === 'menunggu_pengembalian' ? '— ⏳ Menunggu Validasi' : '') ?>
                             </option>
                         <?php endforeach; ?>
                     <?php endif; ?>

@@ -20,12 +20,12 @@ class Pengembalian {
                          a.nama_alat, a.kode as kode_alat,
                          k.nama_kategori
                   FROM " . $this->table_name . " pg
-                  JOIN peminjaman p ON pg.id_peminjaman = p.id
-                  JOIN peminjam pm ON p.id_peminjam = pm.id
+                  JOIN peminjaman p ON pg.id_peminjaman = p.id_peminjaman
+                  JOIN peminjam pm ON p.id_peminjam = pm.id_peminjam
                   LEFT JOIN user u ON pg.id_user = u.id_user
-                  LEFT JOIN detail_peminjaman dp ON dp.id_peminjaman = p.id
-                  LEFT JOIN alat a ON dp.id_alat = a.id
-                  LEFT JOIN kategori k ON a.id_kategori = k.id
+                  LEFT JOIN detail_peminjaman dp ON dp.id_peminjaman = p.id_peminjaman
+                  LEFT JOIN alat a ON dp.id_alat = a.id_alat
+                  LEFT JOIN kategori k ON a.id_kategori = k.id_kategori
                   WHERE 1=1";
 
         if (!empty($keyword)) {
@@ -56,11 +56,11 @@ class Pengembalian {
                          dp.id_alat, dp.jumlah,
                          a.nama_alat, a.kode as kode_alat
                   FROM " . $this->table_name . " pg
-                  JOIN peminjaman p ON pg.id_peminjaman = p.id
-                  JOIN peminjam pm ON p.id_peminjam = pm.id
+                  JOIN peminjaman p ON pg.id_peminjaman = p.id_peminjaman
+                  JOIN peminjam pm ON p.id_peminjam = pm.id_peminjam
                   LEFT JOIN user u ON pg.id_user = u.id_user
-                  LEFT JOIN detail_peminjaman dp ON dp.id_peminjaman = p.id
-                  LEFT JOIN alat a ON dp.id_alat = a.id
+                  LEFT JOIN detail_peminjaman dp ON dp.id_peminjaman = p.id_peminjaman
+                  LEFT JOIN alat a ON dp.id_alat = a.id_alat
                   WHERE pg.id = :id
                   LIMIT 1";
 
@@ -94,7 +94,7 @@ class Pengembalian {
             // 2. Update status peminjaman jadi 'dikembalikan' dan isi waktu_kembali
             $queryPeminjaman = "UPDATE peminjaman 
                                 SET status = 'dikembalikan', waktu_kembali = :waktu_kembali 
-                                WHERE id = :id_peminjaman";
+                                WHERE id_peminjaman = :id_peminjaman";
             $stmtPeminjaman = $this->conn->prepare($queryPeminjaman);
             $stmtPeminjaman->bindParam(':waktu_kembali', $waktu_kembali);
             $stmtPeminjaman->bindParam(':id_peminjaman', $id_peminjaman, PDO::PARAM_INT);
@@ -108,7 +108,7 @@ class Pengembalian {
             $details = $stmtDetail->fetchAll(PDO::FETCH_ASSOC);
 
             foreach ($details as $d) {
-                $queryStock = "UPDATE alat SET jumlah = jumlah + :jumlah WHERE id = :id_alat";
+                $queryStock = "UPDATE alat SET jumlah = jumlah + :jumlah WHERE id_alat = :id_alat";
                 $stmtStock = $this->conn->prepare($queryStock);
                 $stmtStock->bindParam(':jumlah', $d['jumlah'], PDO::PARAM_INT);
                 $stmtStock->bindParam(':id_alat', $d['id_alat'], PDO::PARAM_INT);
@@ -151,12 +151,12 @@ class Pengembalian {
                          a.nama_alat, a.kode as kode_alat,
                          k.nama_kategori
                   FROM " . $this->table_name . " pg
-                  JOIN peminjaman p ON pg.id_peminjaman = p.id
-                  JOIN peminjam pm ON p.id_peminjam = pm.id
+                  JOIN peminjaman p ON pg.id_peminjaman = p.id_peminjaman
+                  JOIN peminjam pm ON p.id_peminjam = pm.id_peminjam
                   LEFT JOIN user u ON pg.id_user = u.id_user
-                  LEFT JOIN detail_peminjaman dp ON dp.id_peminjaman = p.id
-                  LEFT JOIN alat a ON dp.id_alat = a.id
-                  LEFT JOIN kategori k ON a.id_kategori = k.id
+                  LEFT JOIN detail_peminjaman dp ON dp.id_peminjaman = p.id_peminjaman
+                  LEFT JOIN alat a ON dp.id_alat = a.id_alat
+                  LEFT JOIN kategori k ON a.id_kategori = k.id_kategori
                   WHERE p.id_peminjam = :idPeminjam";
 
         if (!empty($keyword)) {
@@ -181,7 +181,7 @@ class Pengembalian {
     public function getTotalDendaByPeminjamId($idPeminjam) {
         $query = "SELECT SUM(pg.denda) as total_denda 
                   FROM " . $this->table_name . " pg 
-                  JOIN peminjaman p ON pg.id_peminjaman = p.id 
+                  JOIN peminjaman p ON pg.id_peminjaman = p.id_peminjaman 
                   WHERE p.id_peminjam = :idPeminjam";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':idPeminjam', $idPeminjam, PDO::PARAM_INT);
@@ -198,11 +198,11 @@ class Pengembalian {
                          a.nama_alat, a.kode as kode_alat,
                          dp.jumlah
                   FROM " . $this->table_name . " pg
-                  JOIN peminjaman p ON pg.id_peminjaman = p.id
-                  JOIN peminjam pm ON p.id_peminjam = pm.id
+                  JOIN peminjaman p ON pg.id_peminjaman = p.id_peminjaman
+                  JOIN peminjam pm ON p.id_peminjam = pm.id_peminjam
                   LEFT JOIN user u ON pg.id_user = u.id_user
-                  LEFT JOIN detail_peminjaman dp ON dp.id_peminjaman = p.id
-                  LEFT JOIN alat a ON dp.id_alat = a.id
+                  LEFT JOIN detail_peminjaman dp ON dp.id_peminjaman = p.id_peminjaman
+                  LEFT JOIN alat a ON dp.id_alat = a.id_alat
                   WHERE pg.denda > 0";
 
         if (!empty($keyword)) {
@@ -220,7 +220,6 @@ class Pengembalian {
         $stmt->execute();
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Tambahkan status bayar (default Lunas jika denda telah terekam saat verifikasi pengembalian)
         foreach ($rows as &$r) {
             $r['status_bayar'] = isset($r['status_bayar']) ? $r['status_bayar'] : 'Lunas';
         }

@@ -182,6 +182,9 @@ switch ($controller) {
             case 'tambah_pengembalian':
                 $petugas->tambah_pengembalian();
                 break;
+            case 'verifikasi_pengembalian':
+                $petugas->verifikasi_pengembalian();
+                break;
             case 'alat':
                 $petugas->alat();
                 break;
