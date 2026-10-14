@@ -135,12 +135,33 @@ require_once __DIR__ . '/peminjam_header.php';
                     <tr>
                         <td><?= $no++ ?></td>
                         <td>
-                            <div style="font-family: monospace; font-size: 11px; font-weight: 700; color: var(--primary-teal);"><?= htmlspecialchars($p['kode_peminjaman'] ?? '-') ?></div>
-                            <strong style="color: var(--primary-navy);"><?= htmlspecialchars($p['nama_alat'] ?? 'Alat Lab') ?></strong>
-                            <div style="font-size: 11px; color: var(--text-muted);"><?= htmlspecialchars($p['kode_alat'] ?? '') ?></div>
+                            <div style="font-family: monospace; font-size: 11px; font-weight: 700; color: var(--primary-teal); margin-bottom: 2px;"><?= htmlspecialchars($p['kode_peminjaman'] ?? '-') ?></div>
+                            <?php if (!empty($p['items']) && count($p['items']) > 1): ?>
+                                <span style="font-size: 11px; font-weight: 700; background: #e0f2fe; color: #0284c7; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 3px;">
+                                    📦 <?= count($p['items']) ?> Jenis Alat
+                                </span>
+                                <div style="display: flex; flex-direction: column; gap: 3px;">
+                                    <?php foreach ($p['items'] as $item): ?>
+                                        <div style="font-size: 12px; color: var(--primary-navy);">
+                                            &bull; <strong><?= htmlspecialchars($item['nama_alat']) ?></strong> 
+                                            <span style="font-size: 11px; color: var(--text-muted);">(<?= (int)$item['jumlah'] ?> unit)</span>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php else: ?>
+                                <strong style="color: var(--primary-navy);"><?= htmlspecialchars($p['nama_alat'] ?? 'Alat Lab') ?></strong>
+                                <div style="font-size: 11px; color: var(--text-muted);"><?= htmlspecialchars($p['kode_alat'] ?? '') ?></div>
+                            <?php endif; ?>
                         </td>
-                        <td><?= htmlspecialchars($p['nama_kategori'] ?? '-') ?></td>
-                        <td><strong><?= (int)($p['jumlah'] ?? 1) ?></strong> unit</td>
+                        <td>
+                            <?= (!empty($p['items']) && count($p['items']) > 1) ? 'Multi-Alat' : htmlspecialchars($p['nama_kategori'] ?? '-') ?>
+                        </td>
+                        <td>
+                            <strong><?= (int)($p['jumlah'] ?? 1) ?></strong> unit
+                            <?php if (!empty($p['items']) && count($p['items']) > 1): ?>
+                                <div style="font-size: 11px; color: var(--text-muted);">(<?= count($p['items']) ?> macam)</div>
+                            <?php endif; ?>
+                        </td>
                         <td><?= !empty($p['waktu_pinjam']) ? date('H:i', strtotime($p['waktu_pinjam'])) . ' WIB' : '-' ?></td>
                         <td>
                             <strong style="color: var(--teal-dark);"><?= !empty($p['waktu_rencana_kembali']) ? date('H:i', strtotime($p['waktu_rencana_kembali'])) . ' WIB' : '-' ?></strong>

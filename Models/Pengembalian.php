@@ -11,29 +11,85 @@ class Pengembalian {
         $this->conn = $database->getConnection();
     }
 
+    /**
+     * Memperkaya daftar pengembalian dengan detail alat yang dipinjam
+     */
+    private function attachDetailsToPengembalianList(array $pengembalianList) {
+        if (empty($pengembalianList)) return [];
+
+        $loanIds = array_filter(array_map('intval', array_column($pengembalianList, 'id_peminjaman')));
+        if (empty($loanIds)) return $pengembalianList;
+
+        $inClause = implode(',', array_unique($loanIds));
+        try {
+            $stmtItems = $this->conn->query("
+                SELECT dp.*, a.nama_alat, a.kode as kode_alat, k.nama_kategori
+                FROM detail_peminjaman dp
+                JOIN alat a ON dp.id_alat = a.id_alat
+                LEFT JOIN kategori k ON a.id_kategori = k.id_kategori
+                WHERE dp.id_peminjaman IN ($inClause)
+            ");
+            $allDetails = $stmtItems ? $stmtItems->fetchAll(PDO::FETCH_ASSOC) : [];
+        } catch (Exception $e) {
+            $allDetails = [];
+        }
+
+        $itemsByLoan = [];
+        foreach ($allDetails as $d) {
+            $itemsByLoan[$d['id_peminjaman']][] = $d;
+        }
+
+        foreach ($pengembalianList as &$r) {
+            $loanId = (int)$r['id_peminjaman'];
+            $items = $itemsByLoan[$loanId] ?? [];
+            $r['items'] = $items;
+            if (!empty($items)) {
+                $r['id_alat'] = $items[0]['id_alat'];
+                $r['kode_alat'] = $items[0]['kode_alat'];
+                $r['nama_kategori'] = $items[0]['nama_kategori'];
+                $totalJml = 0;
+                $namaList = [];
+                foreach ($items as $it) {
+                    $totalJml += (int)$it['jumlah'];
+                    $namaList[] = $it['nama_alat'] . ' (' . $it['jumlah'] . ' unit)';
+                }
+                $r['jumlah'] = $totalJml;
+                $r['nama_alat'] = implode(', ', $namaList);
+                $r['ringkasan_alat'] = implode(', ', $namaList);
+            } else {
+                $r['id_alat'] = null;
+                $r['nama_alat'] = '-';
+                $r['jumlah'] = 0;
+                $r['ringkasan_alat'] = '-';
+            }
+        }
+        unset($r);
+
+        return $pengembalianList;
+    }
+
     public function getAllPengembalian($keyword = null) {
         $query = "SELECT pg.*, 
                          p.kode_peminjaman, p.waktu_pinjam, p.waktu_rencana_kembali,
                          pm.nama as nama_peminjam, pm.nis, pm.kelas, pm.jurusan, pm.no_telp,
-                         u.nama as nama_petugas,
-                         dp.id_alat, dp.jumlah,
-                         a.nama_alat, a.kode as kode_alat,
-                         k.nama_kategori
+                         u.nama as nama_petugas
                   FROM " . $this->table_name . " pg
                   JOIN peminjaman p ON pg.id_peminjaman = p.id_peminjaman
                   JOIN peminjam pm ON p.id_peminjam = pm.id_peminjam
                   LEFT JOIN user u ON pg.id_user = u.id_user
-                  LEFT JOIN detail_peminjaman dp ON dp.id_peminjaman = p.id_peminjaman
-                  LEFT JOIN alat a ON dp.id_alat = a.id_alat
-                  LEFT JOIN kategori k ON a.id_kategori = k.id_kategori
                   WHERE 1=1";
 
         if (!empty($keyword)) {
             $query .= " AND (p.kode_peminjaman LIKE :keyword 
                         OR pm.nama LIKE :keyword 
                         OR pm.nis LIKE :keyword 
-                        OR a.nama_alat LIKE :keyword 
-                        OR pg.kondisi_kembali LIKE :keyword)";
+                        OR pg.kondisi_kembali LIKE :keyword
+                        OR p.id_peminjaman IN (
+                            SELECT dp_sub.id_peminjaman 
+                            FROM detail_peminjaman dp_sub 
+                            JOIN alat a_sub ON dp_sub.id_alat = a_sub.id_alat 
+                            WHERE a_sub.nama_alat LIKE :keyword OR a_sub.kode LIKE :keyword
+                        ))";
         }
 
         $query .= " ORDER BY pg.id DESC";
@@ -45,29 +101,30 @@ class Pengembalian {
         }
 
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->attachDetailsToPengembalianList($rows);
     }
 
     public function getPengembalianById($id) {
         $query = "SELECT pg.*, 
                          p.kode_peminjaman, p.waktu_pinjam, p.waktu_rencana_kembali,
                          pm.nama as nama_peminjam, pm.nis, pm.kelas, pm.jurusan,
-                         u.nama as nama_petugas,
-                         dp.id_alat, dp.jumlah,
-                         a.nama_alat, a.kode as kode_alat
+                         u.nama as nama_petugas
                   FROM " . $this->table_name . " pg
                   JOIN peminjaman p ON pg.id_peminjaman = p.id_peminjaman
                   JOIN peminjam pm ON p.id_peminjam = pm.id_peminjam
                   LEFT JOIN user u ON pg.id_user = u.id_user
-                  LEFT JOIN detail_peminjaman dp ON dp.id_peminjaman = p.id_peminjaman
-                  LEFT JOIN alat a ON dp.id_alat = a.id_alat
                   WHERE pg.id = :id
                   LIMIT 1";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$row) return false;
+
+        $list = $this->attachDetailsToPengembalianList([$row]);
+        return $list[0];
     }
 
     public function createPengembalian($id_peminjaman, $waktu_kembali, $kondisi_kembali, $denda, $id_user) {
@@ -100,7 +157,7 @@ class Pengembalian {
             $stmtPeminjaman->bindParam(':id_peminjaman', $id_peminjaman, PDO::PARAM_INT);
             $stmtPeminjaman->execute();
 
-            // 3. Kembalikan stok alat
+            // 3. Kembalikan stok seluruh alat dalam peminjaman tersebut
             $queryDetail = "SELECT id_alat, jumlah FROM detail_peminjaman WHERE id_peminjaman = :id_peminjaman";
             $stmtDetail = $this->conn->prepare($queryDetail);
             $stmtDetail->bindParam(':id_peminjaman', $id_peminjaman, PDO::PARAM_INT);
@@ -146,23 +203,22 @@ class Pengembalian {
         $query = "SELECT pg.*, 
                          p.kode_peminjaman, p.waktu_pinjam, p.waktu_rencana_kembali,
                          pm.nama as nama_peminjam, pm.nis, pm.kelas, pm.jurusan,
-                         u.nama as nama_petugas,
-                         dp.id_alat, dp.jumlah,
-                         a.nama_alat, a.kode as kode_alat,
-                         k.nama_kategori
+                         u.nama as nama_petugas
                   FROM " . $this->table_name . " pg
                   JOIN peminjaman p ON pg.id_peminjaman = p.id_peminjaman
                   JOIN peminjam pm ON p.id_peminjam = pm.id_peminjam
                   LEFT JOIN user u ON pg.id_user = u.id_user
-                  LEFT JOIN detail_peminjaman dp ON dp.id_peminjaman = p.id_peminjaman
-                  LEFT JOIN alat a ON dp.id_alat = a.id_alat
-                  LEFT JOIN kategori k ON a.id_kategori = k.id_kategori
                   WHERE p.id_peminjam = :idPeminjam";
 
         if (!empty($keyword)) {
             $query .= " AND (p.kode_peminjaman LIKE :keyword 
-                        OR a.nama_alat LIKE :keyword 
-                        OR pg.kondisi_kembali LIKE :keyword)";
+                        OR pg.kondisi_kembali LIKE :keyword
+                        OR p.id_peminjaman IN (
+                            SELECT dp_sub.id_peminjaman 
+                            FROM detail_peminjaman dp_sub 
+                            JOIN alat a_sub ON dp_sub.id_alat = a_sub.id_alat 
+                            WHERE a_sub.nama_alat LIKE :keyword OR a_sub.kode LIKE :keyword
+                        ))";
         }
 
         $query .= " ORDER BY pg.id DESC";
@@ -175,14 +231,15 @@ class Pengembalian {
         }
 
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->attachDetailsToPengembalianList($rows);
     }
 
     public function getTotalDendaByPeminjamId($idPeminjam) {
         $query = "SELECT SUM(pg.denda) as total_denda 
-                  FROM " . $this->table_name . " pg 
-                  JOIN peminjaman p ON pg.id_peminjaman = p.id_peminjaman 
-                  WHERE p.id_peminjam = :idPeminjam";
+                   FROM " . $this->table_name . " pg 
+                   JOIN peminjaman p ON pg.id_peminjaman = p.id_peminjaman 
+                   WHERE p.id_peminjam = :idPeminjam";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':idPeminjam', $idPeminjam, PDO::PARAM_INT);
         $stmt->execute();
@@ -194,15 +251,11 @@ class Pengembalian {
         $query = "SELECT pg.*, 
                          p.kode_peminjaman, p.waktu_pinjam, p.waktu_rencana_kembali,
                          pm.nama as nama_peminjam, pm.nis, pm.kelas, pm.jurusan, pm.no_telp,
-                         u.nama as nama_petugas,
-                         a.nama_alat, a.kode as kode_alat,
-                         dp.jumlah
+                         u.nama as nama_petugas
                   FROM " . $this->table_name . " pg
                   JOIN peminjaman p ON pg.id_peminjaman = p.id_peminjaman
                   JOIN peminjam pm ON p.id_peminjam = pm.id_peminjam
                   LEFT JOIN user u ON pg.id_user = u.id_user
-                  LEFT JOIN detail_peminjaman dp ON dp.id_peminjaman = p.id_peminjaman
-                  LEFT JOIN alat a ON dp.id_alat = a.id_alat
                   WHERE pg.denda > 0";
 
         if (!empty($keyword)) {
@@ -220,6 +273,7 @@ class Pengembalian {
         $stmt->execute();
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+        $rows = $this->attachDetailsToPengembalianList($rows);
         foreach ($rows as &$r) {
             $r['status_bayar'] = isset($r['status_bayar']) ? $r['status_bayar'] : 'Lunas';
         }
