@@ -218,14 +218,6 @@ require_once __DIR__ . '/peminjam_header.php';
             <input type="hidden" name="id_peminjaman" id="kembali_id_peminjaman">
             <input type="hidden" name="redirect" value="pengembalian">
             
-            <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 12px 14px; margin-bottom: 16px; font-size: 12px; color: #92400e; line-height: 1.5;">
-                <div style="font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
-                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                    Wajib Validasi Fisik oleh Petugas Lab (Toolman)
-                </div>
-                Pengembalian ini akan berstatus <strong>Menunggu Validasi Petugas</strong>. Fisik perangkat <strong>wajib diserahkan langsung ke Petugas Lab</strong> untuk pemeriksaan kondisi (Quality Control). Waktu pengembalian, status akhir, dan pemulihan stok hanya akan berlaku setelah Petugas memvalidasi barang di meja lab.
-            </div>
-
             <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px;">
                 <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Perangkat yang Diajukan Kembali:</div>
                 <div style="font-weight: 700; color: var(--navy-primary); font-size: 15px;" id="kembali_nama_alat">-</div>

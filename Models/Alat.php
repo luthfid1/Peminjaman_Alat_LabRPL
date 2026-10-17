@@ -11,8 +11,27 @@ class Alat {
         $this->conn = $database->getConnection();
     }
 
+    private $pkCol = null;
+
+    private function getPkCol() {
+        if ($this->pkCol === null) {
+            $this->pkCol = 'id_alat';
+            try {
+                $chk = $this->conn->query("SHOW COLUMNS FROM " . $this->table_name . " LIKE 'id_alat'");
+                if (!$chk || $chk->rowCount() === 0) {
+                    $chkId = $this->conn->query("SHOW COLUMNS FROM " . $this->table_name . " LIKE 'id'");
+                    if ($chkId && $chkId->rowCount() > 0) {
+                        $this->pkCol = 'id';
+                    }
+                }
+            } catch (Exception $e) {}
+        }
+        return $this->pkCol;
+    }
+
     public function getAllAlat($keyword = null) {
-        $query = "SELECT a.*, a.id_alat as id, k.nama_kategori 
+        $pk = $this->getPkCol();
+        $query = "SELECT a.*, a.{$pk} as id, k.nama_kategori 
                   FROM " . $this->table_name . " a 
                   LEFT JOIN kategori k ON a.id_kategori = k.id_kategori";
 
@@ -20,7 +39,7 @@ class Alat {
             $query .= " WHERE a.nama_alat LIKE :keyword OR a.kode LIKE :keyword OR k.nama_kategori LIKE :keyword OR a.kondisi LIKE :keyword";
         }
 
-        $query .= " ORDER BY a.id_alat DESC";
+        $query .= " ORDER BY a.{$pk} DESC";
         $stmt = $this->conn->prepare($query);
 
         if (!empty($keyword)) {
@@ -33,10 +52,11 @@ class Alat {
     }
 
     public function getAlatById($id) {
-        $query = "SELECT a.*, a.id_alat as id, k.nama_kategori 
+        $pk = $this->getPkCol();
+        $query = "SELECT a.*, a.{$pk} as id, k.nama_kategori 
                   FROM " . $this->table_name . " a 
                   LEFT JOIN kategori k ON a.id_kategori = k.id_kategori 
-                  WHERE a.id_alat = :id 
+                  WHERE a.{$pk} = :id 
                   LIMIT 1";
 
         $stmt = $this->conn->prepare($query);
@@ -60,10 +80,11 @@ class Alat {
     }
 
     public function updateAlat($id, $kode, $id_kategori, $nama_alat, $jumlah, $kondisi, $deskripsi) {
+        $pk = $this->getPkCol();
         $query = "UPDATE " . $this->table_name . " 
                   SET kode = :kode, id_kategori = :id_kategori, nama_alat = :nama_alat, 
                       jumlah = :jumlah, kondisi = :kondisi, deskripsi = :deskripsi 
-                  WHERE id_alat = :id";
+                  WHERE {$pk} = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':kode', $kode);
         $stmt->bindParam(':id_kategori', $id_kategori, PDO::PARAM_INT);
@@ -76,7 +97,13 @@ class Alat {
     }
 
     public function deleteAlat($id) {
-        $query = "DELETE FROM " . $this->table_name . " WHERE id_alat = :id";
+        $pk = $this->getPkCol();
+        try {
+            // Hapus detail peminjaman yang memakai alat ini agar tidak melanggar foreign key
+            $this->conn->exec("DELETE FROM detail_peminjaman WHERE id_alat = " . (int)$id);
+        } catch (Exception $e) {}
+
+        $query = "DELETE FROM " . $this->table_name . " WHERE {$pk} = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         return $stmt->execute();

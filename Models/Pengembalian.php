@@ -74,8 +74,8 @@ class Pengembalian {
                          pm.nama as nama_peminjam, pm.nis, pm.kelas, pm.jurusan, pm.no_telp,
                          u.nama as nama_petugas
                   FROM " . $this->table_name . " pg
-                  JOIN peminjaman p ON pg.id_peminjaman = p.id_peminjaman
-                  JOIN peminjam pm ON p.id_peminjam = pm.id_peminjam
+                  LEFT JOIN peminjaman p ON pg.id_peminjaman = p.id_peminjaman
+                  LEFT JOIN peminjam pm ON p.id_peminjam = pm.id_peminjam
                   LEFT JOIN user u ON pg.id_user = u.id_user
                   WHERE 1=1";
 
@@ -111,8 +111,8 @@ class Pengembalian {
                          pm.nama as nama_peminjam, pm.nis, pm.kelas, pm.jurusan,
                          u.nama as nama_petugas
                   FROM " . $this->table_name . " pg
-                  JOIN peminjaman p ON pg.id_peminjaman = p.id_peminjaman
-                  JOIN peminjam pm ON p.id_peminjam = pm.id_peminjam
+                  LEFT JOIN peminjaman p ON pg.id_peminjaman = p.id_peminjaman
+                  LEFT JOIN peminjam pm ON p.id_peminjam = pm.id_peminjam
                   LEFT JOIN user u ON pg.id_user = u.id_user
                   WHERE pg.id = :id
                   LIMIT 1";
@@ -180,10 +180,26 @@ class Pengembalian {
         }
     }
 
+    private $pkCol = null;
+
+    private function getPkCol() {
+        if ($this->pkCol === null) {
+            $this->pkCol = 'id';
+            try {
+                $chk = $this->conn->query("SHOW COLUMNS FROM " . $this->table_name . " LIKE 'id_pengembalian'");
+                if ($chk && $chk->rowCount() > 0) {
+                    $this->pkCol = 'id_pengembalian';
+                }
+            } catch (Exception $e) {}
+        }
+        return $this->pkCol;
+    }
+
     public function updatePengembalian($id, $waktu_kembali, $kondisi_kembali, $denda) {
+        $pk = $this->getPkCol();
         $query = "UPDATE " . $this->table_name . " 
                   SET waktu_kembali = :waktu_kembali, kondisi_kembali = :kondisi_kembali, denda = :denda 
-                  WHERE id = :id";
+                  WHERE `{$pk}` = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':waktu_kembali', $waktu_kembali);
         $stmt->bindParam(':kondisi_kembali', $kondisi_kembali);
@@ -193,7 +209,8 @@ class Pengembalian {
     }
 
     public function deletePengembalian($id) {
-        $query = "DELETE FROM " . $this->table_name . " WHERE id = :id";
+        $pk = $this->getPkCol();
+        $query = "DELETE FROM " . $this->table_name . " WHERE `{$pk}` = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         return $stmt->execute();

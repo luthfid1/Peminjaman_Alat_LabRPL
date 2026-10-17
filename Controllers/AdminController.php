@@ -69,7 +69,10 @@ class AdminController {
             if ($_GET['status'] === 'added') $message = 'Data alat laboratorium berhasil ditambahkan.';
             if ($_GET['status'] === 'updated') $message = 'Data alat laboratorium berhasil diperbarui.';
             if ($_GET['status'] === 'deleted') $message = 'Data alat laboratorium berhasil dihapus.';
-            if ($_GET['status'] === 'error') $error = 'Terjadi kesalahan saat memproses data alat.';
+            if ($_GET['status'] === 'error') {
+                $error = !empty($_SESSION['flash_error']) ? $_SESSION['flash_error'] : 'Terjadi kesalahan saat memproses data alat.';
+                unset($_SESSION['flash_error']);
+            }
         }
 
         $daftarAlat = $this->alatModel->getAllAlat($keyword);
@@ -98,6 +101,7 @@ class AdminController {
                     header('Location: index.php?c=admin&a=alat&status=added');
                     exit;
                 } catch (Exception $e) {
+                    $_SESSION['flash_error'] = 'Gagal menambah alat: ' . $e->getMessage();
                     header('Location: index.php?c=admin&a=alat&status=error');
                     exit;
                 }
@@ -124,6 +128,7 @@ class AdminController {
                     header('Location: index.php?c=admin&a=alat&status=updated');
                     exit;
                 } catch (Exception $e) {
+                    $_SESSION['flash_error'] = 'Gagal memperbarui alat: ' . $e->getMessage();
                     header('Location: index.php?c=admin&a=alat&status=error');
                     exit;
                 }
@@ -144,6 +149,7 @@ class AdminController {
                 header('Location: index.php?c=admin&a=alat&status=deleted');
                 exit;
             } catch (Exception $e) {
+                $_SESSION['flash_error'] = 'Gagal menghapus alat: ' . $e->getMessage();
                 header('Location: index.php?c=admin&a=alat&status=error');
                 exit;
             }
@@ -164,7 +170,10 @@ class AdminController {
             if ($_GET['status'] === 'added') $message = 'Kategori baru berhasil ditambahkan.';
             if ($_GET['status'] === 'updated') $message = 'Data kategori berhasil diperbarui.';
             if ($_GET['status'] === 'deleted') $message = 'Kategori berhasil dihapus.';
-            if ($_GET['status'] === 'error') $error = 'Terjadi kesalahan pada data kategori.';
+            if ($_GET['status'] === 'error') {
+                $error = !empty($_SESSION['flash_error']) ? $_SESSION['flash_error'] : 'Terjadi kesalahan pada data kategori.';
+                unset($_SESSION['flash_error']);
+            }
         }
 
         $daftarKategori = $this->kategoriModel->getAllKategori($keyword);
@@ -181,6 +190,7 @@ class AdminController {
                     header('Location: index.php?c=admin&a=kategori&status=added');
                     exit;
                 } catch (Exception $e) {
+                    $_SESSION['flash_error'] = 'Gagal menambah kategori: ' . $e->getMessage();
                     header('Location: index.php?c=admin&a=kategori&status=error');
                     exit;
                 }
@@ -202,6 +212,7 @@ class AdminController {
                     header('Location: index.php?c=admin&a=kategori&status=updated');
                     exit;
                 } catch (Exception $e) {
+                    $_SESSION['flash_error'] = 'Gagal memperbarui kategori: ' . $e->getMessage();
                     header('Location: index.php?c=admin&a=kategori&status=error');
                     exit;
                 }
@@ -222,6 +233,7 @@ class AdminController {
                 header('Location: index.php?c=admin&a=kategori&status=deleted');
                 exit;
             } catch (Exception $e) {
+                $_SESSION['flash_error'] = 'Gagal menghapus kategori: ' . $e->getMessage();
                 header('Location: index.php?c=admin&a=kategori&status=error');
                 exit;
             }
@@ -242,7 +254,10 @@ class AdminController {
             if ($_GET['status'] === 'added') $message = 'Data pengguna baru berhasil dibuat.';
             if ($_GET['status'] === 'updated') $message = 'Data pengguna berhasil diperbarui.';
             if ($_GET['status'] === 'deleted') $message = 'Data pengguna berhasil dihapus.';
-            if ($_GET['status'] === 'error') $error = 'Terjadi kesalahan saat memproses pengguna.';
+            if ($_GET['status'] === 'error') {
+                $error = !empty($_SESSION['flash_error']) ? $_SESSION['flash_error'] : 'Terjadi kesalahan saat memproses pengguna.';
+                unset($_SESSION['flash_error']);
+            }
         }
 
         $daftarPengguna = $this->userModel->getAllUsers($keyword);
@@ -263,6 +278,7 @@ class AdminController {
                     header('Location: index.php?c=admin&a=pengguna&status=added');
                     exit;
                 } catch (Exception $e) {
+                    $_SESSION['flash_error'] = 'Gagal menambah pengguna: ' . $e->getMessage();
                     header('Location: index.php?c=admin&a=pengguna&status=error');
                     exit;
                 }
@@ -287,6 +303,7 @@ class AdminController {
                     header('Location: index.php?c=admin&a=pengguna&status=updated');
                     exit;
                 } catch (Exception $e) {
+                    $_SESSION['flash_error'] = 'Gagal memperbarui pengguna: ' . $e->getMessage();
                     header('Location: index.php?c=admin&a=pengguna&status=error');
                     exit;
                 }
@@ -301,6 +318,7 @@ class AdminController {
         if ($id_user > 0) {
             // Cegah menghapus akun yang sedang login
             if ($id_user == $this->getUserId()) {
+                $_SESSION['flash_error'] = 'Tidak dapat menghapus akun yang sedang Anda gunakan saat ini!';
                 header('Location: index.php?c=admin&a=pengguna&status=error');
                 exit;
             }
@@ -313,6 +331,7 @@ class AdminController {
                 header('Location: index.php?c=admin&a=pengguna&status=deleted');
                 exit;
             } catch (Exception $e) {
+                $_SESSION['flash_error'] = 'Gagal menghapus pengguna: ' . $e->getMessage();
                 header('Location: index.php?c=admin&a=pengguna&status=error');
                 exit;
             }
@@ -333,7 +352,10 @@ class AdminController {
             if ($_GET['status'] === 'added') $message = 'Peminjaman alat lab berhasil dicatat.';
             if ($_GET['status'] === 'updated') $message = 'Data peminjaman berhasil diperbarui.';
             if ($_GET['status'] === 'deleted') $message = 'Data peminjaman berhasil dihapus.';
-            if ($_GET['status'] === 'error') $error = 'Terjadi kesalahan saat memproses data peminjaman.';
+            if ($_GET['status'] === 'error') {
+                $error = !empty($_SESSION['flash_error']) ? $_SESSION['flash_error'] : 'Terjadi kesalahan saat memproses data peminjaman.';
+                unset($_SESSION['flash_error']);
+            }
         }
 
         $daftarPeminjaman = $this->peminjamanModel->getAllPeminjaman($keyword);
@@ -355,6 +377,8 @@ class AdminController {
             $jumlah                  = (int)($_POST['jumlah'] ?? 1);
             $waktu_pinjam            = trim($_POST['waktu_pinjam'] ?? date('H:i:s'));
             $waktu_rencana_kembali   = trim($_POST['waktu_rencana_kembali'] ?? date('H:i:s', strtotime('+2 hours')));
+            if (strlen($waktu_pinjam) === 5) $waktu_pinjam .= ':00';
+            if (strlen($waktu_rencana_kembali) === 5) $waktu_rencana_kembali .= ':00';
             $jenis_peminjaman        = trim($_POST['jenis_peminjaman'] ?? 'Kebutuhan untuk Pembelajaran di Kelas');
             $keperluan               = trim($_POST['keperluan'] ?? '');
             $status                  = trim($_POST['status'] ?? 'disetujui');
@@ -446,6 +470,7 @@ class AdminController {
                     header('Location: index.php?c=admin&a=peminjaman&status=added');
                     exit;
                 } catch (Exception $e) {
+                    $_SESSION['flash_error'] = 'Gagal mencatat peminjaman: ' . $e->getMessage();
                     header('Location: index.php?c=admin&a=peminjaman&status=error');
                     exit;
                 }
@@ -463,6 +488,8 @@ class AdminController {
             $jumlah                  = (int)($_POST['jumlah'] ?? 1);
             $waktu_pinjam            = trim($_POST['waktu_pinjam'] ?? '');
             $waktu_rencana_kembali   = trim($_POST['waktu_rencana_kembali'] ?? '');
+            if (strlen($waktu_pinjam) === 5) $waktu_pinjam .= ':00';
+            if (strlen($waktu_rencana_kembali) === 5) $waktu_rencana_kembali .= ':00';
             $jenis_peminjaman        = trim($_POST['jenis_peminjaman'] ?? 'Kebutuhan untuk Pembelajaran di Kelas');
             $keperluan               = trim($_POST['keperluan'] ?? '');
             $status                  = trim($_POST['status'] ?? 'menunggu');
@@ -484,6 +511,7 @@ class AdminController {
                     header('Location: index.php?c=admin&a=peminjaman&status=updated');
                     exit;
                 } catch (Exception $e) {
+                    $_SESSION['flash_error'] = 'Gagal memperbarui peminjaman: ' . $e->getMessage();
                     header('Location: index.php?c=admin&a=peminjaman&status=error');
                     exit;
                 }
@@ -502,6 +530,7 @@ class AdminController {
                 header('Location: index.php?c=admin&a=peminjaman&status=deleted');
                 exit;
             } catch (Exception $e) {
+                $_SESSION['flash_error'] = 'Gagal menghapus peminjaman: ' . $e->getMessage();
                 header('Location: index.php?c=admin&a=peminjaman&status=error');
                 exit;
             }
@@ -522,7 +551,10 @@ class AdminController {
             if ($_GET['status'] === 'added') $message = 'Pengembalian alat lab berhasil dicatat.';
             if ($_GET['status'] === 'updated') $message = 'Data pengembalian berhasil diperbarui.';
             if ($_GET['status'] === 'deleted') $message = 'Data pengembalian berhasil dihapus.';
-            if ($_GET['status'] === 'error') $error = 'Terjadi kesalahan saat memproses data pengembalian.';
+            if ($_GET['status'] === 'error') {
+                $error = !empty($_SESSION['flash_error']) ? $_SESSION['flash_error'] : 'Terjadi kesalahan saat memproses data pengembalian.';
+                unset($_SESSION['flash_error']);
+            }
         }
 
         $daftarPengembalian = $this->pengembalianModel->getAllPengembalian($keyword);
@@ -535,6 +567,7 @@ class AdminController {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id_peminjaman   = (int)($_POST['id_peminjaman'] ?? 0);
             $waktu_kembali   = trim($_POST['waktu_kembali'] ?? date('H:i:s'));
+            if (strlen($waktu_kembali) === 5) $waktu_kembali .= ':00';
             $kondisi_kembali = trim($_POST['kondisi_kembali'] ?? 'Baik');
             $denda           = (float)($_POST['denda'] ?? 0);
 
@@ -551,6 +584,7 @@ class AdminController {
                     header('Location: index.php?c=admin&a=pengembalian&status=added');
                     exit;
                 } catch (Exception $e) {
+                    $_SESSION['flash_error'] = 'Gagal mencatat pengembalian: ' . $e->getMessage();
                     header('Location: index.php?c=admin&a=pengembalian&status=error');
                     exit;
                 }
@@ -564,6 +598,7 @@ class AdminController {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id              = (int)($_POST['id'] ?? 0);
             $waktu_kembali   = trim($_POST['waktu_kembali'] ?? date('H:i:s'));
+            if (strlen($waktu_kembali) === 5) $waktu_kembali .= ':00';
             $kondisi_kembali = trim($_POST['kondisi_kembali'] ?? 'Baik');
             $denda           = (float)($_POST['denda'] ?? 0);
 
@@ -574,6 +609,7 @@ class AdminController {
                     header('Location: index.php?c=admin&a=pengembalian&status=updated');
                     exit;
                 } catch (Exception $e) {
+                    $_SESSION['flash_error'] = 'Gagal memperbarui pengembalian: ' . $e->getMessage();
                     header('Location: index.php?c=admin&a=pengembalian&status=error');
                     exit;
                 }
@@ -592,6 +628,7 @@ class AdminController {
                 header('Location: index.php?c=admin&a=pengembalian&status=deleted');
                 exit;
             } catch (Exception $e) {
+                $_SESSION['flash_error'] = 'Gagal menghapus pengembalian: ' . $e->getMessage();
                 header('Location: index.php?c=admin&a=pengembalian&status=error');
                 exit;
             }

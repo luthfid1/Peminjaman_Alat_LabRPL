@@ -125,7 +125,30 @@ class Peminjam {
     }
 
     public function deletePeminjam($id) {
-        $query = "DELETE FROM " . $this->table_name . " WHERE id_peminjam = :id";
+        $pk = 'id_peminjam';
+        try {
+            $chk = $this->conn->query("SHOW COLUMNS FROM " . $this->table_name . " LIKE 'id_peminjam'");
+            if (!$chk || $chk->rowCount() === 0) {
+                $pk = 'id';
+            }
+
+            // Bersihkan data transaksi peminjaman & notifikasi terkait peminjam ini
+            $stmtPinjam = $this->conn->prepare("SELECT id_peminjaman FROM peminjaman WHERE id_peminjam = :id");
+            $stmtPinjam->execute([':id' => $id]);
+            $pinjamIds = $stmtPinjam->fetchAll(PDO::FETCH_COLUMN);
+
+            if (!empty($pinjamIds)) {
+                $inClause = implode(',', array_map('intval', $pinjamIds));
+                $this->conn->exec("DELETE FROM pengembalian WHERE id_peminjaman IN ($inClause)");
+                $this->conn->exec("DELETE FROM notifikasi WHERE id_peminjaman IN ($inClause)");
+                $this->conn->exec("DELETE FROM detail_peminjaman WHERE id_peminjaman IN ($inClause)");
+                $this->conn->exec("DELETE FROM peminjaman WHERE id_peminjaman IN ($inClause)");
+            }
+
+            $this->conn->exec("DELETE FROM notifikasi WHERE id_peminjam = " . (int)$id);
+        } catch (Exception $e) {}
+
+        $query = "DELETE FROM " . $this->table_name . " WHERE `{$pk}` = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         return $stmt->execute();

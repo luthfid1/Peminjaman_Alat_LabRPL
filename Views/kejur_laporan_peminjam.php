@@ -68,7 +68,7 @@ require_once __DIR__ . '/kejur_header.php';
                         if (file_exists(__DIR__ . '/../Assets/uploads/jaminan/' . $fotoName)) {
                             $fotoPath = 'Assets/uploads/jaminan/' . $fotoName;
                         } elseif (file_exists(__DIR__ . '/../Assets/uploads/kartu/' . $fotoName)) {
-                            $fotoPath = 'Assets/uploads/kartu/' . $fotoPath;
+                            $fotoPath = 'Assets/uploads/kartu/' . $fotoName;
                         } else {
                             $fotoPath = 'Assets/uploads/jaminan/' . $fotoName;
                         }

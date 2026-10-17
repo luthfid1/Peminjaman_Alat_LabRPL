@@ -194,6 +194,18 @@ class Peminjaman {
             $itemList = [['id_alat' => (int)$id_alat, 'jumlah' => max(1, (int)$jumlah)]];
         }
 
+        // Pastikan kolom jenis_peminjaman berukuran cukup (VARCHAR 100)
+        try {
+            $colInfo = $this->conn->query("SHOW COLUMNS FROM " . $this->table_name . " LIKE 'jenis_peminjaman'")->fetch();
+            if ($colInfo && strpos(strtolower($colInfo['Type'] ?? ''), 'varchar(30)') !== false) {
+                $this->conn->exec("ALTER TABLE " . $this->table_name . " MODIFY COLUMN `jenis_peminjaman` VARCHAR(100) NOT NULL DEFAULT 'Praktek Lab'");
+            }
+        } catch (Exception $e) {}
+
+        if (mb_strlen($jenis_peminjaman) > 100) {
+            $jenis_peminjaman = mb_substr($jenis_peminjaman, 0, 100);
+        }
+
         $this->conn->beginTransaction();
         try {
             $query = "INSERT INTO " . $this->table_name . " 
@@ -247,8 +259,29 @@ class Peminjaman {
     }
 
     public function updatePeminjaman($id, $id_peminjam, $waktu_pinjam, $waktu_rencana_kembali, $jenis_peminjaman, $keperluan, $status, $id_alat = null, $jumlah = null, $items = []) {
+        if (mb_strlen($jenis_peminjaman) > 100) {
+            $jenis_peminjaman = mb_substr($jenis_peminjaman, 0, 100);
+        }
+
+        $borrowedStatuses = ['disetujui', 'dipinjam', 'menunggu_pengembalian', 'menunggu_validasi'];
+        $current = $this->getPeminjamanById($id);
+        $oldStatus = strtolower($current['status'] ?? 'menunggu');
+        $newStatus = strtolower($status);
+
         $this->conn->beginTransaction();
         try {
+            // 1. Jika status lama aktif meminjam, kembalikan stok lama dahulu sebelum diupdate
+            if (in_array($oldStatus, $borrowedStatuses)) {
+                $oldItems = $this->getDetailAlatByPeminjamanId($id);
+                foreach ($oldItems as $od) {
+                    $st = $this->conn->prepare("UPDATE alat SET jumlah = jumlah + :jml WHERE id_alat = :id_alat");
+                    $st->bindParam(':jml', $od['jumlah'], PDO::PARAM_INT);
+                    $st->bindParam(':id_alat', $od['id_alat'], PDO::PARAM_INT);
+                    $st->execute();
+                }
+            }
+
+            // 2. Update data peminjaman
             $query = "UPDATE " . $this->table_name . " 
                       SET id_peminjam = :id_peminjam, waktu_pinjam = :waktu_pinjam, 
                           waktu_rencana_kembali = :waktu_rencana, jenis_peminjaman = :jenis, 
@@ -264,6 +297,7 @@ class Peminjaman {
             $stmt->bindParam(':id', $id, PDO::PARAM_INT);
             $stmt->execute();
 
+            // 3. Update detail_peminjaman
             if (!empty($items) && is_array($items)) {
                 $del = $this->conn->prepare("DELETE FROM detail_peminjaman WHERE id_peminjaman = :id");
                 $del->bindParam(':id', $id, PDO::PARAM_INT);
@@ -295,6 +329,17 @@ class Peminjaman {
                 $stmtDetail->bindParam(':jumlah', $jumlah, PDO::PARAM_INT);
                 $stmtDetail->bindParam(':id', $id, PDO::PARAM_INT);
                 $stmtDetail->execute();
+            }
+
+            // 4. Jika status baru aktif meminjam, kurangi stok baru
+            if (in_array($newStatus, $borrowedStatuses)) {
+                $newItems = $this->getDetailAlatByPeminjamanId($id);
+                foreach ($newItems as $nd) {
+                    $st = $this->conn->prepare("UPDATE alat SET jumlah = GREATEST(0, jumlah - :jml) WHERE id_alat = :id_alat");
+                    $st->bindParam(':jml', $nd['jumlah'], PDO::PARAM_INT);
+                    $st->bindParam(':id_alat', $nd['id_alat'], PDO::PARAM_INT);
+                    $st->execute();
+                }
             }
 
             $this->conn->commit();
@@ -371,6 +416,16 @@ class Peminjaman {
                 }
             }
 
+            try {
+                $delPengembalian = $this->conn->prepare("DELETE FROM pengembalian WHERE id_peminjaman = :id");
+                $delPengembalian->bindParam(':id', $id, PDO::PARAM_INT);
+                $delPengembalian->execute();
+
+                $delNotif = $this->conn->prepare("DELETE FROM notifikasi WHERE id_peminjaman = :id");
+                $delNotif->bindParam(':id', $id, PDO::PARAM_INT);
+                $delNotif->execute();
+            } catch (Exception $e) {}
+
             $delDetail = $this->conn->prepare("DELETE FROM detail_peminjaman WHERE id_peminjaman = :id");
             $delDetail->bindParam(':id', $id, PDO::PARAM_INT);
             $delDetail->execute();
@@ -392,7 +447,7 @@ class Peminjaman {
                          pm.nama as nama_peminjam, pm.nis, pm.kelas, pm.jurusan, pm.no_telp,
                          u.nama as nama_petugas
                   FROM " . $this->table_name . " p
-                  JOIN peminjam pm ON p.id_peminjam = pm.id_peminjam
+                  LEFT JOIN peminjam pm ON p.id_peminjam = pm.id_peminjam
                   LEFT JOIN user u ON p.id_user = u.id_user
                   WHERE p.status IN ('disetujui', 'dipinjam', 'menunggu_pengembalian', 'menunggu_validasi')
                   ORDER BY p.id_peminjaman DESC";

@@ -178,9 +178,9 @@ require_once __DIR__ . '/admin_header.php';
             </div>
 
             <div class="form-group">
-                <label class="form-label">Foto Jaminan (Kartu Identitas Siswa) <span style="color: #dc3545;">*</span></label>
-                <input type="file" id="tambah_pmj_foto" name="foto_kartu_pelajar" class="form-control" accept="image/png, image/jpeg, image/jpg, image/webp" required>
-                <small style="display: block; margin-top: 4px; color: var(--text-muted); font-size: 11px;">Unggah foto kartu pelajar / kartu identitas siswa sebagai jaminan peminjaman (Format: JPG, JPEG, PNG, WEBP).</small>
+                <label class="form-label">Foto Jaminan (Kartu Identitas Siswa) <span style="font-size: 11px; color: var(--text-muted); font-weight: normal;">(Opsional)</span></label>
+                <input type="file" id="tambah_pmj_foto" name="foto_kartu_pelajar" class="form-control" accept="image/png, image/jpeg, image/jpg, image/webp">
+                <small style="display: block; margin-top: 4px; color: var(--text-muted); font-size: 11px;">Unggah foto kartu pelajar / kartu identitas siswa jika ada (Format: JPG, JPEG, PNG, WEBP).</small>
             </div>
 
             <div class="form-group">
@@ -201,9 +201,10 @@ require_once __DIR__ . '/admin_header.php';
                 <div class="form-group" style="flex: 1;">
                     <label class="form-label">Jenis Peminjaman</label>
                     <select name="jenis_peminjaman" class="form-control" required>
+                        <option value="Kebutuhan untuk Pembelajaran di Kelas" selected>Kebutuhan untuk Pembelajaran di Kelas</option>
+                        <option value="Praktek Lab">Praktek Lab</option>
                         <option value="Kebutuhan Rapat">Kebutuhan Rapat</option>
                         <option value="Kebutuhan Kegiatan">Kebutuhan Kegiatan</option>
-                        <option value="Kebutuhan untuk Pembelajaran di Kelas">Kebutuhan untuk Pembelajaran di Kelas</option>
                         <option value="Lainnya">Lainnya</option>
                     </select>
                 </div>
@@ -309,9 +310,10 @@ require_once __DIR__ . '/admin_header.php';
                 <div class="form-group" style="flex: 1;">
                     <label class="form-label">Jenis Peminjaman</label>
                     <select name="jenis_peminjaman" id="edit_pmj_jenis" class="form-control" required>
+                        <option value="Kebutuhan untuk Pembelajaran di Kelas">Kebutuhan untuk Pembelajaran di Kelas</option>
+                        <option value="Praktek Lab">Praktek Lab</option>
                         <option value="Kebutuhan Rapat">Kebutuhan Rapat</option>
                         <option value="Kebutuhan Kegiatan">Kebutuhan Kegiatan</option>
-                        <option value="Kebutuhan untuk Pembelajaran di Kelas">Kebutuhan untuk Pembelajaran di Kelas</option>
                         <option value="Lainnya">Lainnya</option>
                     </select>
                 </div>
@@ -320,35 +322,11 @@ require_once __DIR__ . '/admin_header.php';
             <div class="form-row" style="display: flex; gap: 16px;">
                 <div class="form-group" style="flex: 1;">
                     <label class="form-label">Waktu Mulai Pinjam (WIB)</label>
-                    <select name="waktu_pinjam" id="edit_pmj_waktu_pinjam" class="form-control" required>
-                        <option value="06:30">06.30 (Jam Ke-1)</option>
-                        <option value="07:10">07.10 (Jam Ke-2)</option>
-                        <option value="07:50">07.50 (Jam Ke-3)</option>
-                        <option value="08:30">08.30 (Jam Ke-4)</option>
-                        <option value="09:25">09.25 (Jam Ke-5)</option>
-                        <option value="10:05">10.05 (Jam Ke-6)</option>
-                        <option value="10:45">10.45 (Jam Ke-7)</option>
-                        <option value="11:25">11.25 (Jam Ke-8)</option>
-                        <option value="12:35">12.35 (Jam Ke-9)</option>
-                        <option value="13:15">13.15 (Jam Ke-10)</option>
-                        <option value="13:55">13.55 (Jam Ke-11)</option>
-                    </select>
+                    <input type="time" name="waktu_pinjam" id="edit_pmj_waktu_pinjam" class="form-control" required>
                 </div>
                 <div class="form-group" style="flex: 1;">
                     <label class="form-label">Waktu Rencana Kembali (WIB)</label>
-                    <select name="waktu_rencana_kembali" id="edit_pmj_waktu_rencana" class="form-control" required>
-                        <option value="07:10">07.10 (Jam Ke-2)</option>
-                        <option value="07:50">07.50 (Jam Ke-3)</option>
-                        <option value="08:30">08.30 (Jam Ke-4)</option>
-                        <option value="09:10">09.10 (Istirahat)</option>
-                        <option value="10:05">10.05 (Jam Ke-6)</option>
-                        <option value="10:45">10.45 (Jam Ke-7)</option>
-                        <option value="11:25">11.25 (Jam Ke-8)</option>
-                        <option value="12:05">12.05 (Ishoma)</option>
-                        <option value="13:15">13.15 (Jam Ke-10)</option>
-                        <option value="13:55">13.55 (Jam Ke-11)</option>
-                        <option value="14:35">14.35 (Selesai KBM)</option>
-                    </select>
+                    <input type="time" name="waktu_rencana_kembali" id="edit_pmj_waktu_rencana" class="form-control" required>
                 </div>
             </div>
 
@@ -389,7 +367,24 @@ function editPeminjaman(data) {
     document.getElementById('edit_pmj_id_peminjam').value = data.id_peminjam;
     document.getElementById('edit_pmj_id_alat').value = data.id_alat || '';
     document.getElementById('edit_pmj_jumlah').value = data.jumlah || 1;
-    document.getElementById('edit_pmj_jenis').value = data.jenis_peminjaman || 'Praktek Lab';
+
+    var selJenis = document.getElementById('edit_pmj_jenis');
+    var valJenis = data.jenis_peminjaman || 'Kebutuhan untuk Pembelajaran di Kelas';
+    var found = false;
+    for (var i = 0; i < selJenis.options.length; i++) {
+        if (selJenis.options[i].value === valJenis) {
+            found = true;
+            break;
+        }
+    }
+    if (!found && valJenis) {
+        var opt = document.createElement('option');
+        opt.value = valJenis;
+        opt.textContent = valJenis;
+        selJenis.appendChild(opt);
+    }
+    selJenis.value = valJenis;
+
     document.getElementById('edit_pmj_waktu_pinjam').value = data.waktu_pinjam ? data.waktu_pinjam.substring(0, 5) : '';
     document.getElementById('edit_pmj_waktu_rencana').value = data.waktu_rencana_kembali ? data.waktu_rencana_kembali.substring(0, 5) : '';
     document.getElementById('edit_pmj_keperluan').value = data.keperluan || '';

@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS `peminjaman` (
   `waktu_pinjam` TIME NOT NULL,
   `waktu_rencana_kembali` TIME NOT NULL,
   `waktu_kembali` TIME DEFAULT NULL,
-  `jenis_peminjaman` VARCHAR(30) DEFAULT 'Praktek Lab',
+  `jenis_peminjaman` VARCHAR(100) DEFAULT 'Praktek Lab',
   `keperluan` TEXT DEFAULT NULL,
   `status` VARCHAR(30) NOT NULL DEFAULT 'menunggu',
   PRIMARY KEY (`id_peminjaman`),

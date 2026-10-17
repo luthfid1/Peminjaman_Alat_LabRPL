@@ -34,7 +34,7 @@
         <?php endif; ?>
 
         <!-- FORM REGISTER -->
-        <form method="POST" action="index.php?c=auth&a=register">
+        <form method="POST" action="index.php?c=auth&a=register" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="nama" class="form-label">Nama Lengkap Siswa</label>
                 <input type="text" id="nama" name="nama" class="form-control" placeholder="Contoh: Muhammad Rayhan" required autofocus value="<?= htmlspecialchars($_POST['nama'] ?? '') ?>">
@@ -70,13 +70,10 @@
                         <option value="XII RPL 4">
                     </datalist>
                 </div>
-                <div class="form-group" style="flex: 1.5;">
-                    <label for="jurusan" class="form-label">Jurusan</label>
-                    <input type="text" list="daftar-jurusan" id="jurusan" name="jurusan" class="form-control" placeholder="Pilih / isi jurusan" required value="<?= htmlspecialchars($_POST['jurusan'] ?? '') ?>">
-                    <datalist id="daftar-jurusan">
-                        <option value="Rekayasa Perangkat Lunak">
-                
-                    </datalist>
+                <div class="form-group" style="flex: 1;">
+                    <label for="foto_kartu_pelajar" class="form-label">Foto Kartu Pelajar</label>
+                    <input type="file" id="foto_kartu_pelajar" name="foto_kartu_pelajar" class="form-control" accept="image/png, image/jpeg, image/jpg, image/webp" required style="padding: 9px 12px; font-size: 13px;">
+                    <small style="display: block; margin-top: 4px; color: var(--text-muted); font-size: 11px;">Upload foto kartu pelajar (JPG, PNG, WEBP)</small>
                 </div>
             </div>
 

@@ -94,6 +94,10 @@ class Database {
                     $this->conn->exec("ALTER TABLE `user` MODIFY COLUMN `role` ENUM('admin', 'admin pengelola', 'petugas', 'peminjam') NOT NULL DEFAULT 'peminjam'");
                     $this->conn->exec("UPDATE `user` SET `role` = 'admin pengelola' WHERE `role` = 'pengelola'");
                 } catch (Exception $e) {}
+
+                try {
+                    $this->conn->exec("ALTER TABLE `peminjaman` MODIFY COLUMN `jenis_peminjaman` VARCHAR(100) NOT NULL DEFAULT 'Praktek Lab'");
+                } catch (Exception $e) {}
             }
         } catch (Exception $e) {
             // Lanjut jika sudah terinisialisasi

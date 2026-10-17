@@ -11,16 +11,35 @@ class Kategori {
         $this->conn = $database->getConnection();
     }
 
+    private $pkCol = null;
+
+    private function getPkCol() {
+        if ($this->pkCol === null) {
+            $this->pkCol = 'id_kategori';
+            try {
+                $chk = $this->conn->query("SHOW COLUMNS FROM " . $this->table_name . " LIKE 'id_kategori'");
+                if (!$chk || $chk->rowCount() === 0) {
+                    $chkId = $this->conn->query("SHOW COLUMNS FROM " . $this->table_name . " LIKE 'id'");
+                    if ($chkId && $chkId->rowCount() > 0) {
+                        $this->pkCol = 'id';
+                    }
+                }
+            } catch (Exception $e) {}
+        }
+        return $this->pkCol;
+    }
+
     public function getAllKategori($keyword = null) {
-        $query = "SELECT k.*, k.id_kategori as id, 
-                  (SELECT COUNT(*) FROM alat a WHERE a.id_kategori = k.id_kategori) as total_alat 
+        $pk = $this->getPkCol();
+        $query = "SELECT k.*, k.{$pk} as id, 
+                  (SELECT COUNT(*) FROM alat a WHERE a.id_kategori = k.{$pk}) as total_alat 
                   FROM " . $this->table_name . " k";
 
         if (!empty($keyword)) {
             $query .= " WHERE k.nama_kategori LIKE :keyword";
         }
 
-        $query .= " ORDER BY k.id_kategori DESC";
+        $query .= " ORDER BY k.{$pk} DESC";
         $stmt = $this->conn->prepare($query);
 
         if (!empty($keyword)) {
@@ -33,7 +52,8 @@ class Kategori {
     }
 
     public function getKategoriById($id) {
-        $query = "SELECT *, id_kategori as id FROM " . $this->table_name . " WHERE id_kategori = :id LIMIT 1";
+        $pk = $this->getPkCol();
+        $query = "SELECT *, {$pk} as id FROM " . $this->table_name . " WHERE {$pk} = :id LIMIT 1";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
@@ -48,7 +68,8 @@ class Kategori {
     }
 
     public function updateKategori($id, $nama_kategori) {
-        $query = "UPDATE " . $this->table_name . " SET nama_kategori = :nama_kategori WHERE id_kategori = :id";
+        $pk = $this->getPkCol();
+        $query = "UPDATE " . $this->table_name . " SET nama_kategori = :nama_kategori WHERE {$pk} = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':nama_kategori', $nama_kategori);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
@@ -56,7 +77,31 @@ class Kategori {
     }
 
     public function deleteKategori($id) {
-        $query = "DELETE FROM " . $this->table_name . " WHERE id_kategori = :id";
+        $pk = $this->getPkCol();
+
+        // 1. Bersihkan anak-anak relasi (detail_peminjaman & alat terkait) agar tidak terkena Foreign Key constraint violation
+        try {
+            $colAlatPk = 'id_alat';
+            $chkAlatPk = $this->conn->query("SHOW COLUMNS FROM alat LIKE 'id_alat'");
+            if (!$chkAlatPk || $chkAlatPk->rowCount() === 0) {
+                $colAlatPk = 'id';
+            }
+
+            $stmtAlat = $this->conn->prepare("SELECT `{$colAlatPk}` FROM alat WHERE id_kategori = :id");
+            $stmtAlat->execute([':id' => $id]);
+            $alatIds = $stmtAlat->fetchAll(PDO::FETCH_COLUMN);
+
+            if (!empty($alatIds)) {
+                $inClause = implode(',', array_map('intval', $alatIds));
+                // Hapus detail transaksi peminjaman yang menggunakan alat dalam kategori ini
+                $this->conn->exec("DELETE FROM detail_peminjaman WHERE id_alat IN ($inClause)");
+                // Hapus seluruh alat dalam kategori ini
+                $this->conn->exec("DELETE FROM alat WHERE id_kategori = " . (int)$id);
+            }
+        } catch (Exception $e) {}
+
+        // 2. Hapus baris kategori
+        $query = "DELETE FROM " . $this->table_name . " WHERE {$pk} = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         return $stmt->execute();

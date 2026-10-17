@@ -139,13 +139,6 @@ require_once __DIR__ . '/peminjam_header.php';
         </div>
         <form method="POST" action="index.php?c=peminjam&a=ajukan_peminjaman" onsubmit="return validateFormPinjamMulti(event)">
             
-            <div style="background: #f0fdfa; border: 1px solid #ccfbf1; border-radius: 8px; padding: 12px 14px; margin-bottom: 18px; font-size: 12.5px; color: #0f766e; display: flex; align-items: center; gap: 10px;">
-                <span style="font-size: 18px;">💡</span>
-                <div>
-                    <strong>Peminjaman Multi-Alat:</strong> Ingin meminjam perangkat lain bersamaan? Klik <strong>"+ Tambah Alat Lain"</strong> di bawah. Seluruh alat akan masuk dalam 1 permohonan transaksi lab.
-                </div>
-            </div>
-
             <!-- CONTAINER ITEM ALAT -->
             <div style="margin-bottom: 20px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">

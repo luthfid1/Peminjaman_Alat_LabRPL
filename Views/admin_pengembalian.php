@@ -149,8 +149,10 @@ require_once __DIR__ . '/admin_header.php';
                 <div class="form-group" style="flex: 1;">
                     <label class="form-label">Kondisi Alat Saat Kembali</label>
                     <select name="kondisi_kembali" class="form-control" required>
+                        <option value="Baik" selected>Baik (Normal)</option>
                         <option value="Baik & Lengkap">Baik & Lengkap</option>
                         <option value="Rusak Ringan">Rusak Ringan</option>
+                        <option value="Rusak Sedang">Rusak Sedang</option>
                         <option value="Rusak Berat">Rusak Berat</option>
                         <option value="Komponen Hilang">Komponen Hilang</option>
                     </select>
@@ -188,8 +190,10 @@ require_once __DIR__ . '/admin_header.php';
                 <div class="form-group" style="flex: 1;">
                     <label class="form-label">Kondisi Alat</label>
                     <select name="kondisi_kembali" id="edit_pg_kondisi" class="form-control" required>
+                        <option value="Baik">Baik (Normal)</option>
                         <option value="Baik & Lengkap">Baik & Lengkap</option>
                         <option value="Rusak Ringan">Rusak Ringan</option>
+                        <option value="Rusak Sedang">Rusak Sedang</option>
                         <option value="Rusak Berat">Rusak Berat</option>
                         <option value="Komponen Hilang">Komponen Hilang</option>
                     </select>
@@ -219,7 +223,24 @@ function closeModal(id) {
 function editPengembalian(data) {
     document.getElementById('edit_pg_id').value = data.id;
     document.getElementById('edit_pg_waktu_kembali').value = data.waktu_kembali ? data.waktu_kembali.substring(0, 5) : '';
-    document.getElementById('edit_pg_kondisi').value = data.kondisi_kembali || 'Baik & Lengkap';
+
+    var selKondisi = document.getElementById('edit_pg_kondisi');
+    var valKondisi = data.kondisi_kembali || 'Baik';
+    var found = false;
+    for (var i = 0; i < selKondisi.options.length; i++) {
+        if (selKondisi.options[i].value === valKondisi) {
+            found = true;
+            break;
+        }
+    }
+    if (!found && valKondisi) {
+        var opt = document.createElement('option');
+        opt.value = valKondisi;
+        opt.textContent = valKondisi;
+        selKondisi.appendChild(opt);
+    }
+    selKondisi.value = valKondisi;
+
     document.getElementById('edit_pg_denda').value = data.denda || 0;
     openModal('modalUbahPengembalian');
 }

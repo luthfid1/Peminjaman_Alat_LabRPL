@@ -89,14 +89,20 @@ class AuthController {
             $nama             = trim($_POST['nama'] ?? '');
             $nis              = trim($_POST['nis'] ?? '');
             $kelas            = trim($_POST['kelas'] ?? '');
-            $jurusan          = trim($_POST['jurusan'] ?? '');
+            $jurusan          = 'Rekayasa Perangkat Lunak'; // Default lingkungan RPL
             $no_telp          = trim($_POST['no_telp'] ?? '');
             $username         = trim($_POST['username'] ?? '');
             $password         = trim($_POST['password'] ?? '');
             $confirm_password = trim($_POST['confirm_password'] ?? '');
 
-            if (empty($nama) || empty($nis) || empty($kelas) || empty($jurusan) || empty($username) || empty($password)) {
+            $fileData = $_FILES['foto_kartu_pelajar'] ?? $_FILES['foto'] ?? null;
+
+            if (empty($nama) || empty($nis) || empty($kelas) || empty($username) || empty($password)) {
                 $error = 'Semua bidang formulir wajib diisi!';
+            } elseif (!isset($fileData) || empty($fileData['tmp_name']) || $fileData['error'] === UPLOAD_ERR_NO_FILE) {
+                $error = 'Harap unggah foto kartu pelajar Anda!';
+            } elseif ($fileData['error'] !== UPLOAD_ERR_OK) {
+                $error = 'Terjadi kesalahan saat mengunggah foto kartu pelajar. Pastikan file tidak rusak dan ukuran tidak melebihi batas!';
             } elseif (strlen($username) < 3) {
                 $error = 'Username minimal 3 karakter!';
             } elseif (strlen($password) < 5) {
@@ -106,25 +112,53 @@ class AuthController {
             } elseif ($this->userModel->getUserByUsername($username)) {
                 $error = 'Username "' . htmlspecialchars($username) . '" sudah digunakan. Silakan pilih username lain!';
             } else {
-                try {
-                    // Foto jaminan tidak diwajibkan saat registrasi (hanya diinput saat transaksi peminjaman)
-                    $foto_kartu = '';
+                $ext = strtolower(pathinfo($fileData['name'], PATHINFO_EXTENSION));
+                $allowed = ['jpg', 'jpeg', 'png', 'webp'];
 
-                    // 1. Simpan akun ke tabel user
-                    $userId = $this->userModel->createUser($nama, $username, $password, 'peminjam');
-
-                    // 2. Simpan profil siswa ke tabel peminjam (link userId)
-                    $this->peminjamModel->createPeminjam($nama, $nis, $kelas, $jurusan, $no_telp, $foto_kartu, $userId);
-
-                    // 3. Catat riwayat log aktivitas
-                    if ($userId) {
-                        $this->userModel->recordLog($userId, 'Registrasi Akun Siswa', "Pendaftaran siswa baru: {$nama} (NIS: {$nis})");
+                if (!in_array($ext, $allowed)) {
+                    $error = 'Format foto kartu pelajar harus berupa gambar (JPG, JPEG, PNG, WEBP)!';
+                } elseif ($fileData['size'] > 5 * 1024 * 1024) {
+                    $error = 'Ukuran file foto kartu pelajar maksimal 5MB!';
+                } else {
+                    $newFileName = 'kartu_' . time() . '_' . rand(100, 999) . '.' . $ext;
+                    $baseUploadDir = realpath(__DIR__ . '/../Assets/uploads');
+                    if (!$baseUploadDir) {
+                        $baseUploadDir = __DIR__ . '/../Assets/uploads';
+                        @mkdir($baseUploadDir, 0777, true);
                     }
+                    $dirKartu   = $baseUploadDir . '/kartu/';
+                    $dirJaminan = $baseUploadDir . '/jaminan/';
+                    @mkdir($dirKartu, 0777, true);
+                    @mkdir($dirJaminan, 0777, true);
+                    @chmod($dirKartu, 0777);
+                    @chmod($dirJaminan, 0777);
 
-                    header('Location: index.php?c=auth&a=login&status=registered');
-                    exit;
-                } catch (Exception $e) {
-                    $error = 'Terjadi kesalahan database: ' . $e->getMessage();
+                    if (move_uploaded_file($fileData['tmp_name'], $dirKartu . $newFileName)) {
+                        @chmod($dirKartu . $newFileName, 0666);
+                        @copy($dirKartu . $newFileName, $dirJaminan . $newFileName);
+                        @chmod($dirJaminan . $newFileName, 0666);
+                        $foto_kartu = $newFileName;
+
+                        try {
+                            // 1. Simpan akun ke tabel user
+                            $userId = $this->userModel->createUser($nama, $username, $password, 'peminjam');
+
+                            // 2. Simpan profil siswa ke tabel peminjam (link userId)
+                            $this->peminjamModel->createPeminjam($nama, $nis, $kelas, $jurusan, $no_telp, $foto_kartu, $userId);
+
+                            // 3. Catat riwayat log aktivitas
+                            if ($userId) {
+                                $this->userModel->recordLog($userId, 'Registrasi Akun Siswa', "Pendaftaran siswa baru: {$nama} (NIS: {$nis})");
+                            }
+
+                            header('Location: index.php?c=auth&a=login&status=registered');
+                            exit;
+                        } catch (Exception $e) {
+                            $error = 'Terjadi kesalahan database: ' . $e->getMessage();
+                        }
+                    } else {
+                        $error = 'Gagal menyimpan foto kartu pelajar ke server. Pastikan folder uploads dapat ditulis!';
+                    }
                 }
             }
         }
