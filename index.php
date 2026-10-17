@@ -20,14 +20,14 @@ if (empty($controller)) {
 
 switch ($controller) {
     case 'home':
-        require_once __DIR__ . '/controllers/homecontroller.php';
+        require_once __DIR__ . '/Controllers/HomeController.php';
         $home = new HomeController();
         $home->index();
         break;
 
     case 'pengelola':
     case 'admin':
-        require_once __DIR__ . '/controllers/admincontroller.php';
+        require_once __DIR__ . '/Controllers/AdminController.php';
         $admin = new AdminController();
 
         switch ($action) {
@@ -117,7 +117,7 @@ switch ($controller) {
         break;
 
     case 'kejur':
-        require_once __DIR__ . '/controllers/kejurcontroller.php';
+        require_once __DIR__ . '/Controllers/KejurController.php';
         $kejur = new KejurController();
 
         switch ($action) {
@@ -154,7 +154,7 @@ switch ($controller) {
         break;
 
     case 'petugas':
-        require_once __DIR__ . '/controllers/petugascontroller.php';
+        require_once __DIR__ . '/Controllers/PetugasController.php';
         $petugas = new PetugasController();
 
         switch ($action) {
@@ -198,7 +198,7 @@ switch ($controller) {
         break;
 
     case 'peminjam':
-        require_once __DIR__ . '/controllers/peminjamcontroller.php';
+        require_once __DIR__ . '/Controllers/PeminjamController.php';
         $peminjam = new PeminjamController();
 
         switch ($action) {
@@ -231,7 +231,7 @@ switch ($controller) {
         break;
 
     case 'auth':
-        require_once __DIR__ . '/controllers/authcontroller.php';
+        require_once __DIR__ . '/Controllers/AuthController.php';
         $auth = new AuthController();
 
         switch ($action) {

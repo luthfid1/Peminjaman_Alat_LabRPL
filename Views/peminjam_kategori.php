@@ -1,7 +1,7 @@
 <?php
 $activePage = 'kategori';
 $pageTitle = 'Daftar Kategori Alat Musik - NARA BAND';
-require_once 'Views/peminjam_header.php';
+require_once __DIR__ . '/peminjam_header.php';
 ?>
 
 <div class="admin-header-row">
@@ -78,4 +78,4 @@ require_once 'Views/peminjam_header.php';
     <?php endif; ?>
 </section>
 
-<?php require_once 'Views/peminjam_footer.php'; ?>
+<?php require_once __DIR__ . '/peminjam_footer.php'; ?>

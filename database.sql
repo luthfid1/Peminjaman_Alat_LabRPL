@@ -5,8 +5,8 @@
 -- Studi Kasus: Lingkungan Sekolah (Format Waktu: TIME)
 -- ==========================================================
 
-CREATE DATABASE IF NOT EXISTS `db_peminjaman_alat`;
-USE `db_peminjaman_alat`;
+-- CREATE DATABASE IF NOT EXISTS `db_peminjaman_alat`;
+-- USE `db_peminjaman_alat`;
 
 -- ----------------------------------------------------------
 -- 1. Tabel: user
@@ -157,13 +157,13 @@ INSERT INTO `user` (`id_user`, `nama`, `username`, `password`, `role`) VALUES
 (4, 'Siswa Peminjam Lab', 'siswa', '$2y$10$wT0lQn8w8a8J.lZ/B8y/8eX1Q7YQ5tFh2gCqL.N4Z6M7s4Q7kP6eS', 'peminjam')
 ON DUPLICATE KEY UPDATE `nama` = VALUES(`nama`);
 
-INSERT INTO `peminjam` (`id`, `nama`, `nis`, `kelas`, `jurusan`, `no_telp`, `foto_kartu_pelajar`) VALUES
+INSERT INTO `peminjam` (`id_peminjam`, `nama`, `nis`, `kelas`, `jurusan`, `no_telp`, `foto_kartu_pelajar`) VALUES
 (1, 'Luthfi Diandi Rusmana', '10238491', 'XII RPL 4', 'Rekayasa Perangkat Lunak', '081234567890', 'kartu_luthfi.jpg'),
 (2, 'Muhammad Rayhan', '10238492', 'XII RPL 4', 'Rekayasa Perangkat Lunak', '081298765432', 'kartu_rayhan.jpg'),
 (3, 'Siti Nurhaliza', '10238493', 'XII TKJ 2', 'Teknik Komputer dan Jaringan', '085712345678', 'kartu_siti.jpg')
 ON DUPLICATE KEY UPDATE `nama` = VALUES(`nama`);
 
-INSERT INTO `kategori` (`id`, `nama_kategori`) VALUES
+INSERT INTO `kategori` (`id_kategori`, `nama_kategori`) VALUES
 (1, 'Perangkat Jaringan (Networking)'),
 (2, 'Komputer & Laptop'),
 (3, 'Tools & Pengkabelan'),
@@ -171,7 +171,7 @@ INSERT INTO `kategori` (`id`, `nama_kategori`) VALUES
 (5, 'Microcontroller & IoT')
 ON DUPLICATE KEY UPDATE `nama_kategori` = VALUES(`nama_kategori`);
 
-INSERT INTO `alat` (`id`, `kode`, `id_kategori`, `nama_alat`, `jumlah`, `kondisi`, `deskripsi`) VALUES
+INSERT INTO `alat` (`id_alat`, `kode`, `id_kategori`, `nama_alat`, `jumlah`, `kondisi`, `deskripsi`) VALUES
 (1, 'ALT-NET-001', 1, 'MikroTik RouterBoard RB750r2', 15, 'Baik', 'Routerboard 5 port Ethernet 10/100 Mbps untuk simulasi routing dan hotspot.'),
 (2, 'ALT-NET-002', 1, 'Cisco Catalyst Switch 2960 24-Port', 6, 'Baik', 'Managed switch 24 port fast ethernet untuk topologi VLAN.'),
 (3, 'ALT-TOL-001', 3, 'Crimping Tool RJ45 RJ11 Cat5/Cat6', 20, 'Baik', 'Tang crimping kabel UTP RJ45 & RJ11 gagang ergonomis.'),

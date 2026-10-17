@@ -1,12 +1,12 @@
 <?php
 
-require_once __DIR__ . '/../models/user.php';
-require_once __DIR__ . '/../models/alat.php';
-require_once __DIR__ . '/../models/kategori.php';
-require_once __DIR__ . '/../models/peminjaman.php';
-require_once __DIR__ . '/../models/pengembalian.php';
-require_once __DIR__ . '/../models/peminjam.php';
-require_once __DIR__ . '/../models/notifikasi.php';
+require_once __DIR__ . '/../Models/User.php';
+require_once __DIR__ . '/../Models/Alat.php';
+require_once __DIR__ . '/../Models/Kategori.php';
+require_once __DIR__ . '/../Models/Peminjaman.php';
+require_once __DIR__ . '/../Models/Pengembalian.php';
+require_once __DIR__ . '/../Models/Peminjam.php';
+require_once __DIR__ . '/../Models/Notifikasi.php';
 
 class PeminjamController {
     private $userModel;
@@ -98,7 +98,7 @@ class PeminjamController {
 
         $tglStr = date('l, d F Y');
 
-        require_once __DIR__ . '/../views/peminjam_dashboard.php';
+        require_once __DIR__ . '/../Views/peminjam_dashboard.php';
     }
 
     // ==========================================
@@ -117,7 +117,7 @@ class PeminjamController {
         $daftarKategori = $this->kategoriModel->getAllKategori();
         $profile = $this->getPeminjamProfile();
 
-        require_once __DIR__ . '/../views/peminjam_alat.php';
+        require_once __DIR__ . '/../Views/peminjam_alat.php';
     }
 
     // ==========================================
@@ -148,7 +148,7 @@ class PeminjamController {
         $notifikasiBelumDibaca = $this->notifikasiModel->getNotifikasiByPeminjam($idPeminjam, true);
         $remindedLoanIds = $this->notifikasiModel->getActiveReminderLoanIds($idPeminjam);
 
-        require_once __DIR__ . '/../views/peminjam_peminjaman.php';
+        require_once __DIR__ . '/../Views/peminjam_peminjaman.php';
     }
 
     // ==========================================
@@ -372,6 +372,6 @@ class PeminjamController {
             return in_array(strtolower($item['status']), ['disetujui', 'dipinjam', 'menunggu_pengembalian']);
         }));
 
-        require_once __DIR__ . '/../views/peminjam_pengembalian.php';
+        require_once __DIR__ . '/../Views/peminjam_pengembalian.php';
     }
 }

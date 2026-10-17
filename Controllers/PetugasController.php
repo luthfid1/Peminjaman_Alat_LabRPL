@@ -1,11 +1,11 @@
 <?php
 
-require_once __DIR__ . '/../models/user.php';
-require_once __DIR__ . '/../models/alat.php';
-require_once __DIR__ . '/../models/kategori.php';
-require_once __DIR__ . '/../models/peminjaman.php';
-require_once __DIR__ . '/../models/pengembalian.php';
-require_once __DIR__ . '/../models/notifikasi.php';
+require_once __DIR__ . '/../Models/User.php';
+require_once __DIR__ . '/../Models/Alat.php';
+require_once __DIR__ . '/../Models/Kategori.php';
+require_once __DIR__ . '/../Models/Peminjaman.php';
+require_once __DIR__ . '/../Models/Pengembalian.php';
+require_once __DIR__ . '/../Models/Notifikasi.php';
 
 class PetugasController {
     private $userModel;
@@ -70,7 +70,7 @@ class PetugasController {
 
         $permohonanMenunggu = $this->peminjamanModel->getAllPeminjaman(null, 'menunggu');
 
-        require_once __DIR__ . '/../views/petugas_dashboard.php';
+        require_once __DIR__ . '/../Views/petugas_dashboard.php';
     }
 
     // ==========================================
@@ -94,7 +94,7 @@ class PetugasController {
         $daftarPeminjaman = $this->peminjamanModel->getAllPeminjaman($keyword, $statusFilter);
         $notifikasiModel = $this->notifikasiModel;
 
-        require_once __DIR__ . '/../views/petugas_peminjaman.php';
+        require_once __DIR__ . '/../Views/petugas_peminjaman.php';
     }
 
     public function setujui_peminjaman() {
@@ -217,7 +217,7 @@ class PetugasController {
         $peminjamanAktif      = $this->peminjamanModel->getActivePeminjaman();
         $menungguPengembalian = $this->peminjamanModel->getMenungguPengembalian($keyword);
 
-        require_once __DIR__ . '/../views/petugas_pengembalian.php';
+        require_once __DIR__ . '/../Views/petugas_pengembalian.php';
     }
 
     public function verifikasi_pengembalian() {
@@ -402,7 +402,7 @@ class PetugasController {
         }
         $daftarKategori = $this->kategoriModel->getAllKategori();
 
-        require_once __DIR__ . '/../views/petugas_alat.php';
+        require_once __DIR__ . '/../Views/petugas_alat.php';
     }
 
     // ==========================================
@@ -415,6 +415,6 @@ class PetugasController {
         $daftarPeminjaman = $this->peminjamanModel->getAllPeminjaman(null, $status ?: null);
         $daftarPengembalian = $this->pengembalianModel->getAllPengembalian();
 
-        require_once __DIR__ . '/../views/petugas_laporan.php';
+        require_once __DIR__ . '/../Views/petugas_laporan.php';
     }
 }

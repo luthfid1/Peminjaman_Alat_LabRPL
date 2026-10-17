@@ -1,11 +1,11 @@
 <?php
 
-require_once __DIR__ . '/../models/alat.php';
-require_once __DIR__ . '/../models/kategori.php';
-require_once __DIR__ . '/../models/user.php';
-require_once __DIR__ . '/../models/peminjaman.php';
-require_once __DIR__ . '/../models/pengembalian.php';
-require_once __DIR__ . '/../models/peminjam.php';
+require_once __DIR__ . '/../Models/Alat.php';
+require_once __DIR__ . '/../Models/Kategori.php';
+require_once __DIR__ . '/../Models/User.php';
+require_once __DIR__ . '/../Models/Peminjaman.php';
+require_once __DIR__ . '/../Models/Pengembalian.php';
+require_once __DIR__ . '/../Models/Peminjam.php';
 
 class AdminController {
     private $alatModel;
@@ -54,7 +54,7 @@ class AdminController {
         $bulanArr = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
         $tglStr = strtoupper($hariArr[date('w')] . ', ' . date('j') . ' ' . $bulanArr[(int)date('n')] . ' ' . date('Y'));
 
-        require_once __DIR__ . '/../views/admin_dashboard.php';
+        require_once __DIR__ . '/../Views/admin_dashboard.php';
     }
 
     // ==========================================
@@ -78,7 +78,7 @@ class AdminController {
         $daftarAlat = $this->alatModel->getAllAlat($keyword);
         $daftarKategori = $this->kategoriModel->getAllKategori();
 
-        require_once __DIR__ . '/../views/admin_alat.php';
+        require_once __DIR__ . '/../Views/admin_alat.php';
     }
 
     public function tambah_alat() {
@@ -177,7 +177,7 @@ class AdminController {
         }
 
         $daftarKategori = $this->kategoriModel->getAllKategori($keyword);
-        require_once __DIR__ . '/../views/admin_kategori.php';
+        require_once __DIR__ . '/../Views/admin_kategori.php';
     }
 
     public function tambah_kategori() {
@@ -261,7 +261,7 @@ class AdminController {
         }
 
         $daftarPengguna = $this->userModel->getAllUsers($keyword);
-        require_once __DIR__ . '/../views/admin_pengguna.php';
+        require_once __DIR__ . '/../Views/admin_pengguna.php';
     }
 
     public function tambah_pengguna() {
@@ -362,7 +362,7 @@ class AdminController {
         $daftarPeminjam = $this->peminjamModel->getAllPeminjam();
         $daftarAlat = $this->alatModel->getAllAlat();
 
-        require_once __DIR__ . '/../views/admin_peminjaman.php';
+        require_once __DIR__ . '/../Views/admin_peminjaman.php';
     }
 
     public function tambah_peminjaman() {
@@ -560,7 +560,7 @@ class AdminController {
         $daftarPengembalian = $this->pengembalianModel->getAllPengembalian($keyword);
         $peminjamanAktif = $this->peminjamanModel->getActivePeminjaman();
 
-        require_once __DIR__ . '/../views/admin_pengembalian.php';
+        require_once __DIR__ . '/../Views/admin_pengembalian.php';
     }
 
     public function tambah_pengembalian() {
@@ -646,6 +646,6 @@ class AdminController {
         $totalPeminjamanAktif = count($this->peminjamanModel->getActivePeminjaman());
         $daftarPeminjamanAktif = $this->peminjamanModel->getActivePeminjaman();
 
-        require_once __DIR__ . '/../views/admin_log.php';
+        require_once __DIR__ . '/../Views/admin_log.php';
     }
 }

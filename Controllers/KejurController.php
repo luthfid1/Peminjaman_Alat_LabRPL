@@ -1,11 +1,11 @@
 <?php
 
-require_once __DIR__ . '/../models/user.php';
-require_once __DIR__ . '/../models/alat.php';
-require_once __DIR__ . '/../models/kategori.php';
-require_once __DIR__ . '/../models/peminjam.php';
-require_once __DIR__ . '/../models/peminjaman.php';
-require_once __DIR__ . '/../models/pengembalian.php';
+require_once __DIR__ . '/../Models/User.php';
+require_once __DIR__ . '/../Models/Alat.php';
+require_once __DIR__ . '/../Models/Kategori.php';
+require_once __DIR__ . '/../Models/Peminjam.php';
+require_once __DIR__ . '/../Models/Peminjaman.php';
+require_once __DIR__ . '/../Models/Pengembalian.php';
 
 class KejurController {
     private $userModel;
@@ -81,7 +81,7 @@ class KejurController {
         // Audit Trail Terbaru (5 log terakhir)
         $auditLogsTerbaru = array_slice($this->userModel->getAllLogs(), 0, 5);
 
-        require_once __DIR__ . '/../views/kejur_dashboard.php';
+        require_once __DIR__ . '/../Views/kejur_dashboard.php';
     }
 
     // ==========================================
@@ -106,7 +106,7 @@ class KejurController {
         }
 
         $daftarAlat = $this->alatModel->getAllAlat();
-        require_once __DIR__ . '/../views/kejur_laporan_peminjaman.php';
+        require_once __DIR__ . '/../Views/kejur_laporan_peminjaman.php';
     }
 
     // ==========================================
@@ -117,7 +117,7 @@ class KejurController {
         $daftarDenda = $this->pengembalianModel->getLaporanKasDenda(null, $keyword);
         $statDenda = $this->pengembalianModel->getStatistikDenda();
 
-        require_once __DIR__ . '/../views/kejur_laporan_denda.php';
+        require_once __DIR__ . '/../Views/kejur_laporan_denda.php';
     }
 
     // ==========================================
@@ -127,7 +127,7 @@ class KejurController {
         $keyword = isset($_GET['search']) ? trim($_GET['search']) : '';
         $daftarLog = $this->userModel->getAllLogs($keyword);
 
-        require_once __DIR__ . '/../views/kejur_log.php';
+        require_once __DIR__ . '/../Views/kejur_log.php';
     }
 
     // ==========================================
@@ -145,14 +145,14 @@ class KejurController {
         }
         $daftarKategori = $this->kategoriModel->getAllKategori();
 
-        require_once __DIR__ . '/../views/kejur_inventaris.php';
+        require_once __DIR__ . '/../Views/kejur_inventaris.php';
     }
 
     // Kompatibilitas rute lama laporan
     public function laporan_peminjam() {
         $keyword = isset($_GET['search']) ? trim($_GET['search']) : '';
         $daftarPeminjam = $this->peminjamModel->getAllPeminjam($keyword);
-        require_once __DIR__ . '/../views/kejur_laporan_peminjam.php';
+        require_once __DIR__ . '/../Views/kejur_laporan_peminjam.php';
     }
 
     public function laporan_alat() {
@@ -162,6 +162,6 @@ class KejurController {
     public function laporan_pengembalian() {
         $keyword = isset($_GET['search']) ? trim($_GET['search']) : '';
         $daftarPengembalian = $this->pengembalianModel->getAllPengembalian($keyword);
-        require_once __DIR__ . '/../views/kejur_laporan_pengembalian.php';
+        require_once __DIR__ . '/../Views/kejur_laporan_pengembalian.php';
     }
 }

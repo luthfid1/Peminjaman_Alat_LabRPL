@@ -1,7 +1,7 @@
 <?php
 
-require_once __DIR__ . '/../models/user.php';
-require_once __DIR__ . '/../models/peminjam.php';
+require_once __DIR__ . '/../Models/User.php';
+require_once __DIR__ . '/../Models/Peminjam.php';
 
 class AuthController {
     private $userModel;
@@ -74,7 +74,7 @@ class AuthController {
             }
         }
 
-        require_once __DIR__ . '/../views/login.php';
+        require_once __DIR__ . '/../Views/login.php';
     }
 
     public function register() {
@@ -163,7 +163,7 @@ class AuthController {
             }
         }
 
-        require_once __DIR__ . '/../views/register.php';
+        require_once __DIR__ . '/../Views/register.php';
     }
 
     public function logout() {
