@@ -11,6 +11,13 @@
     <!-- TOP NAVBAR -->
     <header class="navbar">
         <div class="admin-navbar-brand-group">
+            <button class="mobile-sidebar-toggle" id="mobileSidebarToggle" aria-label="Buka Menu" type="button">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
             <a href="index.php?c=admin&a=dashboard" class="nav-brand">
                 <div class="brand-icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -52,8 +59,30 @@
     <!-- APP CONTAINER -->
     <div class="app-container">
         
+        <!-- SIDEBAR BACKDROP FOR MOBILE -->
+        <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
         <!-- SIDEBAR -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="appSidebar">
+            <div class="sidebar-mobile-header">
+                <div class="brand-group" style="gap: 8px;">
+                    <div class="brand-icon" style="width: 28px; height: 28px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                            <line x1="8" y1="21" x2="16" y2="21"></line>
+                            <line x1="12" y1="17" x2="12" y2="21"></line>
+                        </svg>
+                    </div>
+                    <span class="brand-name" style="font-size: 13px;">MENU LAB</span>
+                </div>
+                <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Tutup Menu" type="button">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
             <div class="sidebar-mode-card">
                 <span class="mode-tag">MODE AKTIF</span>
                 <h2 class="mode-title">Pengelola Lab</h2>

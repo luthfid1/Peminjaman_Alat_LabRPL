@@ -26,7 +26,7 @@ require_once __DIR__ . '/peminjam_header.php';
 </div>
 
 <!-- SEARCH & CATEGORY FILTER -->
-<div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: 18px 24px; margin-bottom: 28px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;">
+<div class="catalog-filter-bar" style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: 18px 24px; margin-bottom: 28px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;">
     <!-- SEARCH FORM -->
     <form method="GET" action="index.php" class="search-box" style="margin: 0; min-width: 280px; flex: 1; max-width: 450px;">
         <input type="hidden" name="c" value="peminjam">
@@ -44,7 +44,7 @@ require_once __DIR__ . '/peminjam_header.php';
     </form>
 
     <!-- CATEGORY PILLS -->
-    <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+    <div class="category-pills-row" style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
         <a href="index.php?c=peminjam&a=daftar_alat<?= !empty($_GET['search']) ? '&search=' . urlencode($_GET['search']) : '' ?>" 
            style="padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; text-decoration: none; <?= empty($_GET['kategori']) ? 'background: var(--teal-primary); color: white;' : 'background: #f1f5f9; color: #475569;' ?>">
             Semua (<?= count($daftarAlat) ?>)
@@ -71,7 +71,7 @@ require_once __DIR__ . '/peminjam_header.php';
         <a href="index.php?c=peminjam&a=daftar_alat" class="btn-action-edit" style="display: inline-block; text-decoration: none;">Reset Filter</a>
     </div>
 <?php else: ?>
-    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; margin-bottom: 40px;">
+    <div class="catalog-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; margin-bottom: 40px;">
         <?php foreach ($daftarAlat as $alat): 
             $stok = (int)($alat['jumlah'] ?? 0);
             $tersedia = ($stok > 0);

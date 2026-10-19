@@ -23,25 +23,35 @@
                 <span class="brand-title">LAB KOMPUTER</span>
             </a>
 
-            <nav>
-                <ul class="nav-center-links">
-                    <li><a href="index.php" class="active">Beranda</a></li>
-                    <li><a href="#keunggulan">Daftar Alat</a></li>
-                    <li><a href="#tentang">Tentang</a></li>
-                </ul>
-            </nav>
+            <button class="landing-menu-toggle" id="landingMenuToggle" aria-label="Menu Navigasi" type="button">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
 
-            <div class="nav-auth-actions">
-                <?php if (isset($_SESSION['user'])): ?>
-                    <?php 
-                        $userRole = strtolower(trim($_SESSION['user']['role'] ?? 'peminjam'));
-                        $dashboardUrl = in_array($userRole, ['pengelola', 'admin']) ? 'index.php?c=admin&a=dashboard' : 'index.php?c=auth&a=login';
-                    ?>
-                    <a href="<?= $dashboardUrl ?>" class="btn-nav-register" style="padding: 8px 16px;">Ruang Kerja &rarr;</a>
-                <?php else: ?>
-                    <a href="index.php?c=auth&a=login" class="nav-link-login">Login</a>
-                    <a href="index.php?c=auth&a=register" class="btn-nav-register">Daftar</a>
-                <?php endif; ?>
+            <div class="landing-nav-collapse" id="landingNavCollapse">
+                <nav>
+                    <ul class="nav-center-links">
+                        <li><a href="index.php" class="active">Beranda</a></li>
+                        <li><a href="#keunggulan">Daftar Alat</a></li>
+                        <li><a href="#tentang">Tentang</a></li>
+                    </ul>
+                </nav>
+
+                <div class="nav-auth-actions">
+                    <?php if (isset($_SESSION['user'])): ?>
+                        <?php 
+                            $userRole = strtolower(trim($_SESSION['user']['role'] ?? 'peminjam'));
+                            $dashboardUrl = in_array($userRole, ['pengelola', 'admin']) ? 'index.php?c=admin&a=dashboard' : 'index.php?c=auth&a=login';
+                        ?>
+                        <a href="<?= $dashboardUrl ?>" class="btn-nav-register" style="padding: 8px 16px;">Ruang Kerja &rarr;</a>
+                    <?php else: ?>
+                        <a href="index.php?c=auth&a=login" class="nav-link-login">Login</a>
+                        <a href="index.php?c=auth&a=register" class="btn-nav-register">Daftar</a>
+                    <?php endif; ?>
+                </div>
             </div>
         </header>
 
@@ -268,5 +278,6 @@
         </div>
     </footer>
 
+    <script src="Assets/js/mobile.js"></script>
 </body>
 </html>
