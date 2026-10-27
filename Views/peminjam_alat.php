@@ -4,7 +4,6 @@ $pageTitle = 'Katalog Alat Lab Komputer - Ruang Siswa';
 require_once __DIR__ . '/peminjam_header.php';
 ?>
 
-<!-- HEADER ROW -->
 <div class="admin-header-row">
     <div>
         <span class="admin-date-label">KATALOG LABORATORIUM KOMPUTER</span>
@@ -25,9 +24,7 @@ require_once __DIR__ . '/peminjam_header.php';
     </div>
 </div>
 
-<!-- SEARCH & CATEGORY FILTER -->
 <div class="catalog-filter-bar" style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: 18px 24px; margin-bottom: 28px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;">
-    <!-- SEARCH FORM -->
     <form method="GET" action="index.php" class="search-box" style="margin: 0; min-width: 280px; flex: 1; max-width: 450px;">
         <input type="hidden" name="c" value="peminjam">
         <input type="hidden" name="a" value="daftar_alat">
@@ -43,7 +40,6 @@ require_once __DIR__ . '/peminjam_header.php';
         <input type="text" name="search" placeholder="Cari nama alat lab atau kode..." value="<?= htmlspecialchars($_GET['search'] ?? '') ?>">
     </form>
 
-    <!-- CATEGORY PILLS -->
     <div class="category-pills-row" style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
         <a href="index.php?c=peminjam&a=daftar_alat<?= !empty($_GET['search']) ? '&search=' . urlencode($_GET['search']) : '' ?>" 
            style="padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; text-decoration: none; <?= empty($_GET['kategori']) ? 'background: var(--teal-primary); color: white;' : 'background: #f1f5f9; color: #475569;' ?>">
@@ -59,7 +55,6 @@ require_once __DIR__ . '/peminjam_header.php';
     </div>
 </div>
 
-<!-- INSTRUMENTS GRID -->
 <?php if (empty($daftarAlat)): ?>
     <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: 60px 20px; text-align: center;">
         <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="margin: 0 auto 12px auto; color: #94a3b8;">
@@ -77,7 +72,6 @@ require_once __DIR__ . '/peminjam_header.php';
             $tersedia = ($stok > 0);
         ?>
             <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 16px -2px rgba(15, 42, 63, 0.03);">
-                <!-- HEADER CARD / ICON -->
                 <div style="height: 110px; background: linear-gradient(135deg, rgba(20, 184, 166, 0.08), rgba(15, 118, 110, 0.03)); display: flex; align-items: center; justify-content: center; position: relative; border-bottom: 1px solid #f1f5f9;">
                     <div style="width: 52px; height: 52px; border-radius: 50%; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; align-items: center; justify-content: center; color: var(--teal-dark);">
                         <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -94,7 +88,6 @@ require_once __DIR__ . '/peminjam_header.php';
                     </span>
                 </div>
 
-                <!-- BODY CARD -->
                 <div style="padding: 20px; display: flex; flex-direction: column; flex-grow: 1;">
                     <span style="font-size: 11px; font-weight: 700; color: var(--teal-dark); text-transform: uppercase; letter-spacing: 0.5px;">
                         <?= htmlspecialchars($alat['nama_kategori'] ?? 'Umum') ?>
@@ -127,7 +120,6 @@ require_once __DIR__ . '/peminjam_header.php';
     </div>
 <?php endif; ?>
 
-<!-- MODAL FORM PINJAM ALAT (MULTI-ALAT 1 TRANSAKSI) -->
 <div class="modal-overlay" id="modalPinjamAlat">
     <div class="modal-content" style="max-width: 680px; max-height: 90vh; overflow-y: auto;">
         <div class="modal-header">
@@ -138,8 +130,7 @@ require_once __DIR__ . '/peminjam_header.php';
             <button type="button" class="modal-close" onclick="closeModal('modalPinjamAlat')">&times;</button>
         </div>
         <form method="POST" action="index.php?c=peminjam&a=ajukan_peminjaman" onsubmit="return validateFormPinjamMulti(event)">
-            
-            <!-- CONTAINER ITEM ALAT -->
+
             <div style="margin-bottom: 20px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                     <label class="form-label" style="margin: 0; font-size: 14px; font-weight: 700; color: var(--primary-navy);">
@@ -152,7 +143,6 @@ require_once __DIR__ . '/peminjam_header.php';
                 </div>
 
                 <div id="container-alat-rows" style="display: flex; flex-direction: column; gap: 12px;">
-                    <!-- Row Pertama -->
                     <div class="alat-row-item" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; position: relative;">
                         <div style="display: flex; gap: 12px; align-items: flex-start;">
                             <div style="flex: 3;">
@@ -188,14 +178,12 @@ require_once __DIR__ . '/peminjam_header.php';
                     </div>
                 </div>
 
-                <!-- Ringkasan Item -->
                 <div id="badge-total-items" style="margin-top: 10px; background: #f1f5f9; border-radius: 6px; padding: 8px 12px; font-size: 12px; color: #334155; display: flex; justify-content: space-between; align-items: center;">
                     <div>Total diajukan: <strong id="lbl-total-jenis">1</strong> jenis alat (<strong id="lbl-total-unit">1</strong> unit)</div>
                     <span style="font-size: 11px; color: #0284c7; font-weight: 600;">1 Transaksi Tunggal</span>
                 </div>
             </div>
 
-            <!-- WAKTU PINJAM & KEMBALI -->
             <div class="form-row" style="display: flex; gap: 16px;">
                 <div class="form-group" style="flex: 1;">
                     <label class="form-label">Waktu Mulai Pinjam <span style="color: #dc2626;">*</span></label>

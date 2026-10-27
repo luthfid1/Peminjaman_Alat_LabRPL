@@ -15,7 +15,6 @@ require_once __DIR__ . '/petugas_header.php';
     </button>
 </div>
 
-<!-- ALERTS -->
 <?php if (!empty($message)): ?>
     <div class="auth-alert auth-alert-success" style="margin-bottom: 20px;">
         <span><?= htmlspecialchars($message) ?></span>
@@ -28,7 +27,6 @@ require_once __DIR__ . '/petugas_header.php';
     </div>
 <?php endif; ?>
 
-<!-- RIWAYAT PENGEMBALIAN SELESAI -->
 <section class="inventory-section-card">
     <div class="inventory-header">
         <div>
@@ -113,7 +111,6 @@ require_once __DIR__ . '/petugas_header.php';
     </table>
 </section>
 
-<!-- MODAL TAMBAH PENGEMBALIAN MANUAL -->
 <div class="modal-overlay" id="modalTambahPengembalian">
     <div class="modal-content">
         <div class="modal-header">

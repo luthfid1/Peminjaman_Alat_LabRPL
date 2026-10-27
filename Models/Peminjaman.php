@@ -35,9 +35,6 @@ class Peminjaman {
         }
     }
 
-    /**
-     * Mengambil detail alat yang dipinjam dalam satu transaksi
-     */
     public function getDetailAlatByPeminjamanId($idPeminjaman) {
         try {
             $query = "SELECT dp.*, a.nama_alat, a.kode as kode_alat, a.jumlah as stok_alat, a.kondisi as kondisi_alat, k.nama_kategori
@@ -54,9 +51,6 @@ class Peminjaman {
         }
     }
 
-    /**
-     * Memperkaya array daftar peminjaman dengan detail alat (multi-item per transaksi)
-     */
     private function attachDetailsToPeminjamanList(array $peminjamanList) {
         if (empty($peminjamanList)) return [];
 
@@ -90,7 +84,7 @@ class Peminjaman {
                 $r['id_alat'] = $items[0]['id_alat'];
                 $r['kode_alat'] = $items[0]['kode_alat'];
                 $r['nama_kategori'] = $items[0]['nama_kategori'];
-                
+
                 $totalJml = 0;
                 $namaList = [];
                 foreach ($items as $it) {
@@ -178,13 +172,9 @@ class Peminjaman {
         return $list[0];
     }
 
-    /**
-     * Menyimpan transaksi peminjaman (bisa satu atau banyak alat dalam 1 transaksi)
-     */
     public function createPeminjaman($id_peminjam, $id_user, $waktu_pinjam, $waktu_rencana_kembali, $jenis_peminjaman, $keperluan, $id_alat, $jumlah = 1, $status = 'menunggu', $items = []) {
         $kode_peminjaman = $this->generateKodePeminjaman();
 
-        // Tentukan daftar item alat yang dipinjam
         $itemList = [];
         if (!empty($items) && is_array($items)) {
             $itemList = $items;
@@ -194,7 +184,6 @@ class Peminjaman {
             $itemList = [['id_alat' => (int)$id_alat, 'jumlah' => max(1, (int)$jumlah)]];
         }
 
-        // Pastikan kolom jenis_peminjaman berukuran cukup (VARCHAR 100)
         try {
             $colInfo = $this->conn->query("SHOW COLUMNS FROM " . $this->table_name . " LIKE 'jenis_peminjaman'")->fetch();
             if ($colInfo && strpos(strtolower($colInfo['Type'] ?? ''), 'varchar(30)') !== false) {
@@ -270,7 +259,6 @@ class Peminjaman {
 
         $this->conn->beginTransaction();
         try {
-            // 1. Jika status lama aktif meminjam, kembalikan stok lama dahulu sebelum diupdate
             if (in_array($oldStatus, $borrowedStatuses)) {
                 $oldItems = $this->getDetailAlatByPeminjamanId($id);
                 foreach ($oldItems as $od) {
@@ -281,7 +269,6 @@ class Peminjaman {
                 }
             }
 
-            // 2. Update data peminjaman
             $query = "UPDATE " . $this->table_name . " 
                       SET id_peminjam = :id_peminjam, waktu_pinjam = :waktu_pinjam, 
                           waktu_rencana_kembali = :waktu_rencana, jenis_peminjaman = :jenis, 
@@ -297,7 +284,6 @@ class Peminjaman {
             $stmt->bindParam(':id', $id, PDO::PARAM_INT);
             $stmt->execute();
 
-            // 3. Update detail_peminjaman
             if (!empty($items) && is_array($items)) {
                 $del = $this->conn->prepare("DELETE FROM detail_peminjaman WHERE id_peminjaman = :id");
                 $del->bindParam(':id', $id, PDO::PARAM_INT);
@@ -331,7 +317,6 @@ class Peminjaman {
                 $stmtDetail->execute();
             }
 
-            // 4. Jika status baru aktif meminjam, kurangi stok baru
             if (in_array($newStatus, $borrowedStatuses)) {
                 $newItems = $this->getDetailAlatByPeminjamanId($id);
                 foreach ($newItems as $nd) {

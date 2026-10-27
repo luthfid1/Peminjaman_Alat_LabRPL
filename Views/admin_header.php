@@ -8,7 +8,6 @@
 </head>
 <body>
 
-    <!-- TOP NAVBAR -->
     <header class="navbar">
         <div class="admin-navbar-brand-group">
             <button class="mobile-sidebar-toggle" id="mobileSidebarToggle" aria-label="Buka Menu" type="button">
@@ -56,13 +55,10 @@
         </div>
     </header>
 
-    <!-- APP CONTAINER -->
     <div class="app-container">
-        
-        <!-- SIDEBAR BACKDROP FOR MOBILE -->
+
         <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
-        <!-- SIDEBAR -->
         <aside class="sidebar" id="appSidebar">
             <div class="sidebar-mobile-header">
                 <div class="brand-group" style="gap: 8px;">
@@ -173,5 +169,4 @@
             </ul>
         </aside>
 
-        <!-- MAIN CONTENT WRAPPER -->
         <main class="main-content">

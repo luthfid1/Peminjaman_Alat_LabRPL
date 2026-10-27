@@ -15,7 +15,6 @@ require_once __DIR__ . '/peminjam_header.php';
     </button>
 </div>
 
-<!-- ALERTS -->
 <?php if (!empty($message)): ?>
     <div class="auth-alert auth-alert-success">
         <span><?= htmlspecialchars($message) ?></span>
@@ -28,7 +27,6 @@ require_once __DIR__ . '/peminjam_header.php';
     </div>
 <?php endif; ?>
 
-<!-- NOTIFIKASI PENGINGAT DARI PETUGAS LAB -->
 <?php if (!empty($notifikasiBelumDibaca)): ?>
     <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 14px 18px; margin-bottom: 20px; display: flex; align-items: flex-start; gap: 12px;">
         <span style="font-size: 20px;">🔔</span>
@@ -43,7 +41,6 @@ require_once __DIR__ . '/peminjam_header.php';
     </div>
 <?php endif; ?>
 
-<!-- INVENTORY CARD & TABLE -->
 <section class="inventory-section-card">
     <div class="inventory-header">
         <div>
@@ -96,7 +93,7 @@ require_once __DIR__ . '/peminjam_header.php';
                             <div style="font-family: monospace; font-size: 11px; font-weight: 700; color: var(--primary-teal); margin-bottom: 2px;">
                                 <?= htmlspecialchars($p['kode_peminjaman'] ?? '-') ?>
                             </div>
-                            
+
                             <?php if ($isMultiItem): ?>
                                 <div style="margin-bottom: 4px;">
                                     <div style="display: flex; flex-direction: column; gap: 4px;">
@@ -189,7 +186,6 @@ require_once __DIR__ . '/peminjam_header.php';
     </table>
 </section>
 
-<!-- MODAL FORM AJUKAN PEMINJAMAN (MULTI-ALAT 1 TRANSAKSI) -->
 <div class="modal-overlay" id="modalAjukanPinjam">
     <div class="modal-content" style="max-width: 680px; max-height: 90vh; overflow-y: auto;">
         <div class="modal-header">
@@ -201,8 +197,7 @@ require_once __DIR__ . '/peminjam_header.php';
         </div>
 
         <form method="POST" action="index.php?c=peminjam&a=ajukan_peminjaman" id="formAjukanPinjamMulti" onsubmit="return validateFormPinjamMulti(event)">
-            
-            <!-- CONTAINER ITEM ALAT MULTI-ROW -->
+
             <div style="margin-bottom: 20px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                     <label class="form-label" style="margin: 0; font-size: 14px; font-weight: 700; color: var(--primary-navy);">
@@ -215,7 +210,6 @@ require_once __DIR__ . '/peminjam_header.php';
                 </div>
 
                 <div id="container-alat-rows" style="display: flex; flex-direction: column; gap: 12px;">
-                    <!-- Row Pertama (Default) -->
                     <div class="alat-row-item" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; position: relative;">
                         <div style="display: flex; gap: 12px; align-items: flex-start;">
                             <div style="flex: 3;">
@@ -251,14 +245,12 @@ require_once __DIR__ . '/peminjam_header.php';
                     </div>
                 </div>
 
-                <!-- Live Ringkasan Unit -->
                 <div id="badge-total-items" style="margin-top: 10px; background: #f1f5f9; border-radius: 6px; padding: 8px 12px; font-size: 12px; color: #334155; display: flex; justify-content: space-between; align-items: center;">
                     <div>Total diajukan: <strong id="lbl-total-jenis">1</strong> jenis alat (<strong id="lbl-total-unit">1</strong> unit)</div>
                     <span style="font-size: 11px; color: #0284c7; font-weight: 600;">1 Transaksi Tunggal</span>
                 </div>
             </div>
 
-            <!-- WAKTU PINJAM & KEMBALI -->
             <div class="form-row" style="display: flex; gap: 16px;">
                 <div class="form-group" style="flex: 1;">
                     <label class="form-label">Waktu Mulai Pinjam <span style="color: #dc2626;">*</span></label>
@@ -324,7 +316,6 @@ require_once __DIR__ . '/peminjam_header.php';
     </div>
 </div>
 
-<!-- MODAL KONFIRMASI KEMBALIKAN ALAT -->
 <div class="modal-overlay" id="modalKembalikanAlat">
     <div class="modal-content" style="max-width: 520px;">
         <div class="modal-header">
@@ -334,7 +325,7 @@ require_once __DIR__ . '/peminjam_header.php';
         <form method="POST" action="index.php?c=peminjam&a=kembalikan_alat">
             <input type="hidden" name="id_peminjaman" id="kembali_id_peminjaman">
             <input type="hidden" name="redirect" value="peminjaman">
-            
+
             <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px; margin-bottom: 16px;">
                 <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px;">Perangkat yang Dikembalikan:</div>
                 <div id="kembali_container_alat" style="margin-bottom: 6px;">
@@ -362,7 +353,6 @@ require_once __DIR__ . '/peminjam_header.php';
 </div>
 
 <script>
-// Data master alat lab tersedia untuk dynamic rows
 const DAFTAR_ALAT_DATA = <?= json_encode(array_values(array_filter(array_map(function($a) {
     return [
         'id'        => (int)$a['id'],
@@ -405,7 +395,6 @@ function handleAlatChange(selectElem) {
         hint.style.color = 'var(--text-muted)';
     }
 
-    // Peringatan jika alat yang sama dipilih dua kali di baris berbeda
     checkDuplicateAlat(selectElem);
     updateSummaryTotals();
 }

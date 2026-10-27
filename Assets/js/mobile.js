@@ -1,9 +1,4 @@
-/**
- * Peminjaman Alat Lab Komputer - Mobile UI/UX Enhancements
- * Provides mobile navigation, touch optimizations, table responsiveness, and drawer interactions.
- */
 document.addEventListener('DOMContentLoaded', function () {
-    // 1. Mobile Sidebar Drawer Logic
     const toggleBtn = document.getElementById('mobileSidebarToggle');
     const sidebar = document.getElementById('appSidebar');
     const backdrop = document.getElementById('sidebarBackdrop');
@@ -45,7 +40,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Close on Escape key
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
             closeSidebar();
@@ -53,7 +47,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Close when navigating in mobile drawer
     if (sidebar) {
         const menuLinks = sidebar.querySelectorAll('.admin-sidebar-menu a');
         menuLinks.forEach(function (link) {
@@ -65,14 +58,12 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Auto close drawer when resizing past 992px
     window.addEventListener('resize', function () {
         if (window.innerWidth > 992) {
             closeSidebar();
         }
     });
 
-    // 2. Landing Page Mobile Nav Logic
     const landingToggle = document.getElementById('landingMenuToggle');
     const landingCollapse = document.getElementById('landingNavCollapse');
 
@@ -88,14 +79,12 @@ document.addEventListener('DOMContentLoaded', function () {
             landingToggle.classList.toggle('active', isOpen);
         });
 
-        // Close on clicking links
         landingCollapse.querySelectorAll('a').forEach(function (link) {
             link.addEventListener('click', function () {
                 closeLandingMenu();
             });
         });
 
-        // Close on clicking outside
         document.addEventListener('click', function (e) {
             if (!landingCollapse.contains(e.target) && !landingToggle.contains(e.target)) {
                 closeLandingMenu();
@@ -103,7 +92,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // 3. Responsive Table Wrapping & Horizontal Scroll Hint
     const tables = document.querySelectorAll('table.inventory-table');
     tables.forEach(function (table) {
         if (!table.parentElement.classList.contains('table-responsive')) {
@@ -112,7 +100,6 @@ document.addEventListener('DOMContentLoaded', function () {
             table.parentNode.insertBefore(wrapper, table);
             wrapper.appendChild(table);
 
-            // Add scroll hint if on small screen
             if (window.innerWidth <= 768) {
                 const hint = document.createElement('div');
                 hint.className = 'table-mobile-hint';
@@ -130,8 +117,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // 4. Modal Touch Friendly UX
-    // Close modal when clicking outside of modal-content
     document.querySelectorAll('.modal-overlay').forEach(function (overlay) {
         overlay.addEventListener('click', function (e) {
             if (e.target === overlay) {

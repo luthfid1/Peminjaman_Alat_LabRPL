@@ -132,7 +132,6 @@ class Peminjam {
                 $pk = 'id';
             }
 
-            // Bersihkan data transaksi peminjaman & notifikasi terkait peminjam ini
             $stmtPinjam = $this->conn->prepare("SELECT id_peminjaman FROM peminjaman WHERE id_peminjam = :id");
             $stmtPinjam->execute([':id' => $id]);
             $pinjamIds = $stmtPinjam->fetchAll(PDO::FETCH_COLUMN);

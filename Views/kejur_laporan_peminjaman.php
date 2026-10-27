@@ -21,7 +21,6 @@ require_once __DIR__ . '/kejur_header.php';
     </button>
 </div>
 
-<!-- INVENTORY CARD & TABLE -->
 <section class="inventory-section-card">
     <div class="inventory-header no-print">
         <div>
@@ -32,7 +31,7 @@ require_once __DIR__ . '/kejur_header.php';
             <form method="GET" action="index.php" style="margin: 0; display: flex; gap: 8px; flex-wrap: wrap;">
                 <input type="hidden" name="c" value="kejur">
                 <input type="hidden" name="a" value="laporan_peminjaman">
-                
+
                 <select name="status_filter" class="form-control" style="font-size: 13px; height: 38px; padding: 6px 10px;" onchange="this.form.submit()">
                     <option value="">-- Semua Status --</option>
                     <option value="menunggu" <?= (($_GET['status_filter'] ?? '') === 'menunggu') ? 'selected' : '' ?>>Menunggu</option>

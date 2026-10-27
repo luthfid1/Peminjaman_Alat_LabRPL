@@ -21,7 +21,6 @@ class AdminController {
         }
 
         $role = strtolower(trim($_SESSION['user']['role'] ?? ''));
-        // Admin pengelola lab memiliki akses penuh
         if (!isset($_SESSION['user']) || !in_array($role, ['admin pengelola', 'pengelola', 'admin'])) {
             header('Location: index.php?c=auth&a=login');
             exit;
@@ -39,12 +38,9 @@ class AdminController {
         return $_SESSION['user']['id_user'] ?? $_SESSION['user']['id_users'] ?? 1;
     }
 
-    // ==========================================
-    // DASHBOARD
-    // ==========================================
     public function dashboard() {
         $keyword = isset($_GET['search']) ? trim($_GET['search']) : '';
-        
+
         $stats = $this->alatModel->getDashboardStats();
         $totalPengguna = $this->userModel->countUsers();
 
@@ -57,9 +53,6 @@ class AdminController {
         require_once __DIR__ . '/../Views/admin_dashboard.php';
     }
 
-    // ==========================================
-    // CRUD DATA ALAT LAB
-    // ==========================================
     public function alat() {
         $keyword = isset($_GET['search']) ? trim($_GET['search']) : '';
         $message = '';
@@ -158,9 +151,6 @@ class AdminController {
         exit;
     }
 
-    // ==========================================
-    // CRUD DATA KATEGORI
-    // ==========================================
     public function kategori() {
         $keyword = isset($_GET['search']) ? trim($_GET['search']) : '';
         $message = '';
@@ -242,9 +232,6 @@ class AdminController {
         exit;
     }
 
-    // ==========================================
-    // CRUD DATA PENGGUNA (USER)
-    // ==========================================
     public function pengguna() {
         $keyword = isset($_GET['search']) ? trim($_GET['search']) : '';
         $message = '';
@@ -316,7 +303,6 @@ class AdminController {
     public function hapus_pengguna() {
         $id_user = (int)($_GET['id'] ?? 0);
         if ($id_user > 0) {
-            // Cegah menghapus akun yang sedang login
             if ($id_user == $this->getUserId()) {
                 $_SESSION['flash_error'] = 'Tidak dapat menghapus akun yang sedang Anda gunakan saat ini!';
                 header('Location: index.php?c=admin&a=pengguna&status=error');
@@ -340,9 +326,6 @@ class AdminController {
         exit;
     }
 
-    // ==========================================
-    // CRUD DATA PEMINJAMAN
-    // ==========================================
     public function peminjaman() {
         $keyword = isset($_GET['search']) ? trim($_GET['search']) : '';
         $message = '';
@@ -383,7 +366,6 @@ class AdminController {
             $keperluan               = trim($_POST['keperluan'] ?? '');
             $status                  = trim($_POST['status'] ?? 'disetujui');
 
-            // 1. Handle upload foto jaminan kartu identitas siswa jika diunggah
             $foto_kartu = '';
             $fileData = $_FILES['foto_kartu_pelajar'] ?? $_FILES['foto'] ?? null;
             if ($fileData && !empty($fileData['tmp_name']) && $fileData['error'] === UPLOAD_ERR_OK) {
@@ -411,7 +393,6 @@ class AdminController {
                 }
             }
 
-            // 2. Jika admin menginput data peminjam secara manual (seperti register)
             if (!empty($nama)) {
                 $exist = null;
                 if (!empty($nis)) {
@@ -451,7 +432,6 @@ class AdminController {
                 }
             }
 
-            // 3. Simpan transaksi peminjaman alat lab
             if ($id_peminjam > 0 && $id_alat > 0 && $jumlah > 0) {
                 try {
                     $newId = $this->peminjamanModel->createPeminjaman(
@@ -539,9 +519,6 @@ class AdminController {
         exit;
     }
 
-    // ==========================================
-    // CRUD DATA PENGEMBALIAN
-    // ==========================================
     public function pengembalian() {
         $keyword = isset($_GET['search']) ? trim($_GET['search']) : '';
         $message = '';
@@ -637,9 +614,6 @@ class AdminController {
         exit;
     }
 
-    // ==========================================
-    // LOG AKTIVITAS
-    // ==========================================
     public function log() {
         $keyword = isset($_GET['search']) ? trim($_GET['search']) : '';
         $daftarLog = $this->userModel->getAllLogs($keyword);

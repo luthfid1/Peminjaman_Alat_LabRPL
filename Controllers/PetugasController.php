@@ -51,9 +51,6 @@ class PetugasController {
         return (int)($_SESSION['user']['id_user'] ?? $_SESSION['user']['id_users'] ?? 0);
     }
 
-    // ==========================================
-    // 1. DASHBOARD PETUGAS
-    // ==========================================
     public function dashboard() {
         $hariArr = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
         $bulanArr = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
@@ -73,9 +70,6 @@ class PetugasController {
         require_once __DIR__ . '/../Views/petugas_dashboard.php';
     }
 
-    // ==========================================
-    // 2. KELOLA PERSETUJUAN PEMINJAMAN
-    // ==========================================
     public function peminjaman() {
         $keyword = isset($_GET['search']) ? trim($_GET['search']) : '';
         $statusFilter = isset($_GET['status_filter']) ? trim($_GET['status_filter']) : '';
@@ -199,9 +193,6 @@ class PetugasController {
         exit;
     }
 
-    // ==========================================
-    // 3. KELOLA PENGEMBALIAN & VALIDASI FISIK ALAT
-    // ==========================================
     public function pengembalian() {
         $keyword = isset($_GET['search']) ? trim($_GET['search']) : '';
 
@@ -234,8 +225,6 @@ class PetugasController {
                 try {
                     $pmj = $this->peminjamanModel->getPeminjamanById($id_peminjaman);
                     if ($pmj) {
-                        // HITUNG DENDA OTOMATIS OLEH SISTEM (Petugas tidak berhak mengubah / memanipulasi denda)
-                        // 1. Denda Keterlambatan: Rp5.000 / jam
                         $dendaTerlambat = 0;
                         if (!empty($pmj['waktu_rencana_kembali'])) {
                             $tRencana = strtotime($pmj['waktu_rencana_kembali']);
@@ -248,22 +237,17 @@ class PetugasController {
                             }
                         }
 
-                        // 2. Denda Kondisi Fisik (QC):
-                        // - Rusak Ringan (< 50 rb) -> Rp25.000
-                        // - Rusak Sedang           -> Rp100.000
-                        // - Rusak Berat / Hilang   -> Rp150.000
                         $dendaKondisi = 0;
                         if ($kondisi_kembali === 'Rusak Ringan') {
-                            $dendaKondisi = 25000; // di bawah 50 rb
+                            $dendaKondisi = 25000;
                         } elseif ($kondisi_kembali === 'Rusak Sedang') {
-                            $dendaKondisi = 100000; // 100 rb
+                            $dendaKondisi = 100000;
                         } elseif ($kondisi_kembali === 'Rusak Berat' || $kondisi_kembali === 'Komponen Hilang') {
-                            $dendaKondisi = 150000; // 150 rb
+                            $dendaKondisi = 150000;
                         }
 
                         $denda = (float)($dendaTerlambat + $dendaKondisi);
 
-                        // 1. Simpan data pengembalian resmi & pulihkan stok alat
                         $newId = $this->pengembalianModel->createPengembalian(
                             $id_peminjaman,
                             $waktu_kembali,
@@ -272,10 +256,8 @@ class PetugasController {
                             $this->getUserId()
                         );
 
-                        // 2. Tandai notifikasi pengingat lama sebagai telah dibaca
                         $this->notifikasiModel->markAsReadByPeminjaman($id_peminjaman);
 
-                        // 3. Kirim notifikasi konfirmasi ke akun siswa
                         $this->notifikasiModel->createNotifikasi(
                             $pmj['id_peminjam'],
                             $id_peminjaman,
@@ -283,7 +265,6 @@ class PetugasController {
                             "Perangkat {$pmj['nama_alat']} (Kode: {$pmj['kode_peminjaman']}) telah diterima & diverifikasi fisik oleh {$namaPetugas}. Kondisi: {$kondisi_kembali}, Denda: Rp" . number_format($denda, 0, ',', '.') . ". Terima kasih telah menjaga fasilitas lab!"
                         );
 
-                        // 4. Catat Log Aktivitas sebagai Saksi Digital penanggung jawab
                         $descLog = "Petugas {$namaPetugas} telah memvalidasi fisik & menerima pengembalian {$pmj['nama_alat']} ({$pmj['jumlah']} unit) dari siswa {$pmj['nama_peminjam']} (Kode: {$pmj['kode_peminjaman']}). Kondisi: {$kondisi_kembali}, Denda: Rp" . number_format($denda, 0, ',', '.');
                         if (!empty($catatan_qc)) {
                             $descLog .= " | Catatan QC: {$catatan_qc}";
@@ -325,7 +306,6 @@ class PetugasController {
                 try {
                     $pmj = $this->peminjamanModel->getPeminjamanById($id_peminjaman);
 
-                    // HITUNG DENDA OTOMATIS OLEH SISTEM
                     $dendaTerlambat = 0;
                     if ($pmj && !empty($pmj['waktu_rencana_kembali'])) {
                         $tRencana = strtotime($pmj['waktu_rencana_kembali']);
@@ -340,11 +320,11 @@ class PetugasController {
 
                     $dendaKondisi = 0;
                     if ($kondisi_kembali === 'Rusak Ringan') {
-                        $dendaKondisi = 25000; // < 50 rb
+                        $dendaKondisi = 25000;
                     } elseif ($kondisi_kembali === 'Rusak Sedang') {
-                        $dendaKondisi = 100000; // 100 rb
+                        $dendaKondisi = 100000;
                     } elseif ($kondisi_kembali === 'Rusak Berat' || $kondisi_kembali === 'Komponen Hilang') {
-                        $dendaKondisi = 150000; // 150 rb
+                        $dendaKondisi = 150000;
                     }
 
                     $denda = (float)($dendaTerlambat + $dendaKondisi);
@@ -387,9 +367,6 @@ class PetugasController {
         exit;
     }
 
-    // ==========================================
-    // 4. MONITORING INVENTARIS ALAT LAB
-    // ==========================================
     public function alat() {
         $keyword = isset($_GET['search']) ? trim($_GET['search']) : '';
         $idKategori = isset($_GET['kategori']) ? (int)$_GET['kategori'] : 0;
@@ -405,9 +382,6 @@ class PetugasController {
         require_once __DIR__ . '/../Views/petugas_alat.php';
     }
 
-    // ==========================================
-    // 5. LAPORAN TRANSAKSI LAB
-    // ==========================================
     public function laporan() {
         $filter = isset($_GET['tipe']) ? trim($_GET['tipe']) : 'peminjaman';
         $status = isset($_GET['status']) ? trim($_GET['status']) : '';

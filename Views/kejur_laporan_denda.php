@@ -3,7 +3,6 @@ $activePage = 'laporan_denda';
 $pageTitle = 'Laporan Kas Denda & Sanksi - Ketua Jurusan';
 require_once __DIR__ . '/kejur_header.php';
 
-// Fitur Export ke Excel (CSV)
 if (isset($_GET['export']) && $_GET['export'] === 'excel') {
     header('Content-Type: text/csv; charset=utf-8');
     header('Content-Disposition: attachment; filename=Laporan_Kas_Denda_Lab_' . date('Ymd_His') . '.csv');
@@ -54,7 +53,6 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel') {
     </div>
 </div>
 
-<!-- METRIC KAS DENDA -->
 <div class="admin-metrics-grid no-print" style="margin-bottom: 24px;">
     <div class="metric-card" style="border-left: 4px solid #f59e0b;">
         <div class="metric-top-row">
@@ -99,7 +97,6 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel') {
     </div>
 </div>
 
-<!-- INVENTORY CARD & TABLE -->
 <section class="inventory-section-card">
     <div class="inventory-header no-print">
         <div>

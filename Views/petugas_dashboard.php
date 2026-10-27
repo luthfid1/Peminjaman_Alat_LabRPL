@@ -21,7 +21,6 @@ require_once __DIR__ . '/petugas_header.php';
 </div>
 
 <?php if (!empty($totalMenungguKembali) && $totalMenungguKembali > 0): ?>
-    <!-- NOTIFIKASI LANGSUNG PENGAJUAN PENGEMBALIAN DARI SISWA (LANGKAH 2) -->
     <div style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 2px solid #f59e0b; border-radius: var(--radius-lg, 12px); padding: 18px 22px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);">
         <div style="display: flex; align-items: center; gap: 16px;">
             <div style="width: 48px; height: 48px; border-radius: 12px; background: #f59e0b; color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0;">
@@ -43,9 +42,7 @@ require_once __DIR__ . '/petugas_header.php';
     </div>
 <?php endif; ?>
 
-<!-- 3 KARTU USE CASE PETUGAS -->
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 28px;">
-    <!-- KARTU 1: MENYETUJUI PEMINJAMAN -->
     <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm); border-left: 4px solid #f59e0b;">
         <div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
@@ -70,7 +67,6 @@ require_once __DIR__ . '/petugas_header.php';
         </div>
     </div>
 
-    <!-- KARTU 2: MEMANTAU PENGEMBALIAN -->
     <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm); border-left: 4px solid var(--primary-teal);">
         <div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
@@ -100,7 +96,6 @@ require_once __DIR__ . '/petugas_header.php';
         </div>
     </div>
 
-    <!-- KARTU 3: MENCETAK LAPORAN -->
     <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm); border-left: 4px solid #0284c7;">
         <div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
@@ -126,7 +121,6 @@ require_once __DIR__ . '/petugas_header.php';
     </div>
 </div>
 
-<!-- SECTION 1: PERMOHONAN MENUNGGU PERSETUJUAN -->
 <section class="inventory-section-card" style="margin-bottom: 24px;">
     <div class="inventory-header">
         <div>
@@ -197,7 +191,6 @@ require_once __DIR__ . '/petugas_header.php';
     </table>
 </section>
 
-<!-- SECTION 2: PEMANTAUAN PENGEMBALIAN & PEMINJAMAN AKTIF -->
 <section class="inventory-section-card">
     <div class="inventory-header">
         <div>

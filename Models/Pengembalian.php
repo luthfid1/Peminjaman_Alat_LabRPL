@@ -11,9 +11,6 @@ class Pengembalian {
         $this->conn = $database->getConnection();
     }
 
-    /**
-     * Memperkaya daftar pengembalian dengan detail alat yang dipinjam
-     */
     private function attachDetailsToPengembalianList(array $pengembalianList) {
         if (empty($pengembalianList)) return [];
 
@@ -130,7 +127,6 @@ class Pengembalian {
     public function createPengembalian($id_peminjaman, $waktu_kembali, $kondisi_kembali, $denda, $id_user) {
         $this->conn->beginTransaction();
         try {
-            // 1. Simpan data pengembalian
             $query = "INSERT INTO " . $this->table_name . " 
                       (id_peminjaman, waktu_kembali, kondisi_kembali, denda, id_user) 
                       VALUES (:id_peminjaman, :waktu_kembali, :kondisi_kembali, :denda, :id_user)";
@@ -148,7 +144,6 @@ class Pengembalian {
 
             $pengembalianId = $this->conn->lastInsertId();
 
-            // 2. Update status peminjaman jadi 'dikembalikan' dan isi waktu_kembali
             $queryPeminjaman = "UPDATE peminjaman 
                                 SET status = 'dikembalikan', waktu_kembali = :waktu_kembali 
                                 WHERE id_peminjaman = :id_peminjaman";
@@ -157,7 +152,6 @@ class Pengembalian {
             $stmtPeminjaman->bindParam(':id_peminjaman', $id_peminjaman, PDO::PARAM_INT);
             $stmtPeminjaman->execute();
 
-            // 3. Kembalikan stok seluruh alat dalam peminjaman tersebut
             $queryDetail = "SELECT id_alat, jumlah FROM detail_peminjaman WHERE id_peminjaman = :id_peminjaman";
             $stmtDetail = $this->conn->prepare($queryDetail);
             $stmtDetail->bindParam(':id_peminjaman', $id_peminjaman, PDO::PARAM_INT);

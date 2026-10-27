@@ -99,7 +99,6 @@ class Alat {
     public function deleteAlat($id) {
         $pk = $this->getPkCol();
         try {
-            // Hapus detail peminjaman yang memakai alat ini agar tidak melanggar foreign key
             $this->conn->exec("DELETE FROM detail_peminjaman WHERE id_alat = " . (int)$id);
         } catch (Exception $e) {}
 
@@ -153,7 +152,6 @@ class Alat {
             }
         } catch (Exception $e) {}
 
-        // Fallback jika belum ada transaksi: ambil alat teratas
         try {
             $q = $this->conn->query("SELECT nama_alat, kode, 0 as total_pinjam FROM alat ORDER BY id_alat ASC LIMIT 5");
             return $q->fetchAll(PDO::FETCH_ASSOC);

@@ -3,14 +3,12 @@ $activePage = 'dashboard';
 $pageTitle = 'Dashboard Eksekutif Monitoring - Ketua Jurusan';
 require_once __DIR__ . '/kejur_header.php';
 
-// Kalkulasi persentase kondisi alat untuk Pie Chart
 $totalFisik = array_sum($kondisiDist);
 $pctBaik = ($totalFisik > 0) ? round(($kondisiDist['Baik'] / $totalFisik) * 100, 1) : 0;
 $pctRingan = ($totalFisik > 0) ? round(($kondisiDist['Rusak Ringan'] / $totalFisik) * 100, 1) : 0;
 $pctBerat = ($totalFisik > 0) ? round(($kondisiDist['Rusak Berat'] / $totalFisik) * 100, 1) : 0;
 ?>
 
-<!-- HEADER TITLE -->
 <div class="admin-header-row">
     <div>
         <span class="admin-date-label"><?= htmlspecialchars($tglStr) ?></span>
@@ -19,11 +17,7 @@ $pctBerat = ($totalFisik > 0) ? round(($kondisiDist['Rusak Berat'] / $totalFisik
     </div>
 </div>
 
-<!-- =============================================
-     1. COUNTER RINGKASAN REAL-TIME
-     ============================================= -->
 <div class="admin-metrics-grid" style="margin-bottom: 24px;">
-    <!-- COUNTER 1: ALAT SEDANG DIPINJAM -->
     <div class="metric-card" style="border-left: 4px solid var(--teal-primary);">
         <div class="metric-top-row">
             <span class="metric-label">Alat Sedang Dipinjam</span>
@@ -39,7 +33,6 @@ $pctBerat = ($totalFisik > 0) ? round(($kondisiDist['Rusak Berat'] / $totalFisik
         <div class="metric-sub"><?= count($alatAktifDipinjam) ?> transaksi pinjam aktif saat ini</div>
     </div>
 
-    <!-- COUNTER 2: PENGEMBALIAN TERLAMBAT -->
     <div class="metric-card" style="border-left: 4px solid <?= ($totalTerlambat > 0) ? '#ef4444' : '#10b981' ?>;">
         <div class="metric-top-row">
             <span class="metric-label">Pengembalian Terlambat</span>
@@ -54,7 +47,6 @@ $pctBerat = ($totalFisik > 0) ? round(($kondisiDist['Rusak Berat'] / $totalFisik
         <div class="metric-sub"><?= ($totalTerlambat > 0) ? '⚠ Perlu perhatian khusus laboran' : 'Semua transaksi tepat waktu' ?></div>
     </div>
 
-    <!-- COUNTER 3: KAS DENDA LABORATORIUM -->
     <div class="metric-card" style="border-left: 4px solid #f59e0b;">
         <div class="metric-top-row">
             <span class="metric-label">Kas Sanksi / Denda</span>
@@ -70,7 +62,6 @@ $pctBerat = ($totalFisik > 0) ? round(($kondisiDist['Rusak Berat'] / $totalFisik
         <div class="metric-sub"><?= (int)($statDenda['total_kasus'] ?? 0) ?> kasus sanksi tercatat</div>
     </div>
 
-    <!-- COUNTER 4: TOTAL INVENTARIS ASET -->
     <div class="metric-card" style="border-left: 4px solid var(--navy-primary);">
         <div class="metric-top-row">
             <span class="metric-label">Total Aset Terdata</span>
@@ -86,12 +77,8 @@ $pctBerat = ($totalFisik > 0) ? round(($kondisiDist['Rusak Berat'] / $totalFisik
     </div>
 </div>
 
-<!-- =============================================
-     GRAFIK & STATISTIK REAL-TIME (CHART VISUAL)
-     ============================================= -->
 <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; margin-bottom: 24px;">
-    
-    <!-- GRAFIK 1: TREN ALAT PALING SERING DIPINJAM -->
+
     <div class="inventory-section-card" style="margin-bottom: 0;">
         <div class="inventory-header" style="border-bottom: 1px solid var(--border-color); padding-bottom: 14px;">
             <div>
@@ -115,7 +102,7 @@ $pctBerat = ($totalFisik > 0) ? round(($kondisiDist['Rusak Berat'] / $totalFisik
                 <div style="display: flex; flex-direction: column; gap: 14px;">
                     <?php foreach ($topAlat as $idx => $t): 
                         $pct = ($maxBorrow > 0) ? round(((int)$t['total_pinjam'] / $maxBorrow) * 100) : 0;
-                        $pct = max(12, $pct); // Minimal lebar bar visual
+                        $pct = max(12, $pct);
                     ?>
                         <div>
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 13px;">
@@ -137,7 +124,6 @@ $pctBerat = ($totalFisik > 0) ? round(($kondisiDist['Rusak Berat'] / $totalFisik
         </div>
     </div>
 
-    <!-- GRAFIK 2: STATUS ASET LAB (PIE CHART PERSENTASE KONDISI) -->
     <div class="inventory-section-card" style="margin-bottom: 0;">
         <div class="inventory-header" style="border-bottom: 1px solid var(--border-color); padding-bottom: 14px;">
             <div>
@@ -149,9 +135,7 @@ $pctBerat = ($totalFisik > 0) ? round(($kondisiDist['Rusak Berat'] / $totalFisik
         </div>
 
         <div style="padding: 16px 0; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-            <!-- CSS PIE CHART (CONIC-GRADIENT) -->
             <?php
-                // Hitung sudut conic gradient
                 $degBaik = ($pctBaik / 100) * 360;
                 $degRingan = $degBaik + (($pctRingan / 100) * 360);
             ?>
@@ -186,7 +170,6 @@ $pctBerat = ($totalFisik > 0) ? round(($kondisiDist['Rusak Berat'] / $totalFisik
                 </div>
             </div>
 
-            <!-- LEGENDA PERSENTASE -->
             <div style="width: 100%; display: flex; flex-direction: column; gap: 8px; font-size: 12px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; padding: 4px 8px; border-radius: 6px; background: #ecfdf5;">
                     <span style="display: flex; align-items: center; gap: 6px; color: #065f46; font-weight: 600;">
@@ -214,9 +197,6 @@ $pctBerat = ($totalFisik > 0) ? round(($kondisiDist['Rusak Berat'] / $totalFisik
     </div>
 </div>
 
-<!-- =============================================
-     SHORTCUT 4 MENU UTAMA KETUA JURUSAN
-     ============================================= -->
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 24px;">
     <a href="index.php?c=kejur&a=laporan_peminjaman" style="background: white; border: 1px solid var(--border-color); border-radius: 12px; padding: 16px 18px; text-decoration: none; display: flex; align-items: center; gap: 14px; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'" onmouseout="this.style.boxShadow='none'">
         <div style="width: 42px; height: 42px; border-radius: 10px; background: rgba(14, 165, 233, 0.1); color: #0284c7; display: flex; align-items: center; justify-content: center;">
@@ -272,11 +252,7 @@ $pctBerat = ($totalFisik > 0) ? round(($kondisiDist['Rusak Berat'] / $totalFisik
     </a>
 </div>
 
-<!-- =============================================
-     TABEL DUA KOLOM: TRANSAKSI AKTIF & AUDIT TRAIL TERBARU
-     ============================================= -->
 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-    <!-- TRANSAKSI AKTIF SEDANG DIPINJAM -->
     <section class="inventory-section-card" style="margin-bottom: 0;">
         <div class="inventory-header">
             <div>
@@ -338,7 +314,6 @@ $pctBerat = ($totalFisik > 0) ? round(($kondisiDist['Rusak Berat'] / $totalFisik
         </table>
     </section>
 
-    <!-- REKAM AUDIT TRAIL TERBARU -->
     <section class="inventory-section-card" style="margin-bottom: 0;">
         <div class="inventory-header">
             <div>

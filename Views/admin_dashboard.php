@@ -4,7 +4,6 @@ $pageTitle = 'Pusat Kendali - Pengelola Lab Komputer';
 require_once __DIR__ . '/admin_header.php';
 ?>
 
-<!-- HEADER ROW -->
 <div class="admin-header-row">
     <div>
         <span class="admin-date-label"><?= htmlspecialchars($tglStr) ?></span>
@@ -16,7 +15,6 @@ require_once __DIR__ . '/admin_header.php';
     </a>
 </div>
 
-<!-- 4 METRIC CARDS -->
 <div class="admin-metrics-grid">
     <div class="metric-card">
         <div class="metric-top-row">
@@ -76,7 +74,6 @@ require_once __DIR__ . '/admin_header.php';
     </div>
 </div>
 
-<!-- INVENTARIS ALAT TABLE -->
 <section class="inventory-section-card">
     <div class="inventory-header">
         <div>

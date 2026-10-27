@@ -12,7 +12,6 @@ require_once __DIR__ . '/peminjam_header.php';
     </div>
 </div>
 
-<!-- ALERTS -->
 <?php if (!empty($message)): ?>
     <div class="auth-alert auth-alert-success" style="margin-bottom: 20px;">
         <span><?= htmlspecialchars($message) ?></span>
@@ -25,7 +24,6 @@ require_once __DIR__ . '/peminjam_header.php';
     </div>
 <?php endif; ?>
 
-<!-- PERANGKAT YANG SEDANG DIPINJAM (MENUNGGU DIKEMBALIKAN) -->
 <?php if (!empty($daftarPeminjamanAktif)): ?>
     <section class="inventory-section-card" style="border: 2px solid #14b8a6; margin-bottom: 24px; background: #f0fdfa;">
         <div class="inventory-header">
@@ -96,7 +94,6 @@ require_once __DIR__ . '/peminjam_header.php';
     </section>
 <?php endif; ?>
 
-<!-- INFO BOX -->
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 24px;">
     <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px 20px; display: flex; align-items: center; gap: 16px;">
         <div style="width: 44px; height: 44px; border-radius: 10px; background: rgba(20, 184, 166, 0.1); color: var(--teal-dark); display: flex; align-items: center; justify-content: center;">
@@ -127,7 +124,6 @@ require_once __DIR__ . '/peminjam_header.php';
     </div>
 </div>
 
-<!-- INVENTORY CARD & TABLE -->
 <section class="inventory-section-card">
     <div class="inventory-header">
         <div>
@@ -207,7 +203,6 @@ require_once __DIR__ . '/peminjam_header.php';
     </table>
 </section>
 
-<!-- MODAL KONFIRMASI KEMBALIKAN ALAT -->
 <div class="modal-overlay" id="modalKembalikanAlat" style="display: none;">
     <div class="modal-content" style="max-width: 500px;">
         <div class="modal-header">
@@ -217,7 +212,7 @@ require_once __DIR__ . '/peminjam_header.php';
         <form method="POST" action="index.php?c=peminjam&a=kembalikan_alat">
             <input type="hidden" name="id_peminjaman" id="kembali_id_peminjaman">
             <input type="hidden" name="redirect" value="pengembalian">
-            
+
             <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px;">
                 <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Perangkat yang Diajukan Kembali:</div>
                 <div style="font-weight: 700; color: var(--navy-primary); font-size: 15px;" id="kembali_nama_alat">-</div>

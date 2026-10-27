@@ -26,7 +26,6 @@ class KejurController {
         }
 
         $role = strtolower(trim($_SESSION['user']['role'] ?? ''));
-        // Hak akses Ketua Jurusan (role: admin) dan Pengelola (role: admin pengelola)
         if (!in_array($role, ['admin', 'admin pengelola', 'pengelola'])) {
             if ($role === 'petugas') {
                 header('Location: index.php?c=petugas&a=dashboard');
@@ -48,9 +47,6 @@ class KejurController {
         $this->pengembalianModel = new Pengembalian();
     }
 
-    // ==========================================
-    // 1. DASHBOARD MONITORING KETUA JURUSAN (STATISTIK & GRAFIK REAL-TIME)
-    // ==========================================
     public function dashboard() {
         $hariArr = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
         $bulanArr = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
@@ -61,7 +57,6 @@ class KejurController {
         $totalPeminjaman = count($this->peminjamanModel->getAllPeminjaman());
         $totalPengembalian = count($this->pengembalianModel->getAllPengembalian());
 
-        // Counter Ringkasan Real-Time
         $alatAktifDipinjam = $this->peminjamanModel->getActivePeminjaman();
         $totalAlatSedangDipinjam = 0;
         foreach ($alatAktifDipinjam as $ap) {
@@ -69,24 +64,17 @@ class KejurController {
         }
         $totalTerlambat = $this->peminjamanModel->countLatePeminjaman();
 
-        // Grafik 1: Tren Alat Paling Sering Dipinjam
         $topAlat = $this->alatModel->getTopBorrowedAlat(5);
 
-        // Grafik 2: Status Aset Lab (Pie Chart Persentase Kondisi)
         $kondisiDist = $this->alatModel->getKondisiDistribution();
 
-        // Rekapitulasi Kas Denda
         $statDenda = $this->pengembalianModel->getStatistikDenda();
 
-        // Audit Trail Terbaru (5 log terakhir)
         $auditLogsTerbaru = array_slice($this->userModel->getAllLogs(), 0, 5);
 
         require_once __DIR__ . '/../Views/kejur_dashboard.php';
     }
 
-    // ==========================================
-    // 2. LAPORAN EKSEKUTIF: RIWAYAT PEMINJAMAN
-    // ==========================================
     public function laporan_peminjaman() {
         $keyword = isset($_GET['search']) ? trim($_GET['search']) : '';
         $statusFilter = isset($_GET['status_filter']) ? trim($_GET['status_filter']) : '';
@@ -109,9 +97,6 @@ class KejurController {
         require_once __DIR__ . '/../Views/kejur_laporan_peminjaman.php';
     }
 
-    // ==========================================
-    // 2b. LAPORAN EKSEKUTIF: KAS DENDA & SANKSI
-    // ==========================================
     public function laporan_denda() {
         $keyword = isset($_GET['search']) ? trim($_GET['search']) : '';
         $daftarDenda = $this->pengembalianModel->getLaporanKasDenda(null, $keyword);
@@ -120,9 +105,6 @@ class KejurController {
         require_once __DIR__ . '/../Views/kejur_laporan_denda.php';
     }
 
-    // ==========================================
-    // 3. AUDIT TRAIL / LOG AKTIVITAS GLOBAL
-    // ==========================================
     public function log() {
         $keyword = isset($_GET['search']) ? trim($_GET['search']) : '';
         $daftarLog = $this->userModel->getAllLogs($keyword);
@@ -130,9 +112,6 @@ class KejurController {
         require_once __DIR__ . '/../Views/kejur_log.php';
     }
 
-    // ==========================================
-    // 4. DAFTAR INVENTARIS ALAT LAB (READ-ONLY)
-    // ==========================================
     public function inventaris() {
         $keyword = isset($_GET['search']) ? trim($_GET['search']) : '';
         $idKategori = isset($_GET['kategori']) ? (int)$_GET['kategori'] : 0;
@@ -148,7 +127,6 @@ class KejurController {
         require_once __DIR__ . '/../Views/kejur_inventaris.php';
     }
 
-    // Kompatibilitas rute lama laporan
     public function laporan_peminjam() {
         $keyword = isset($_GET['search']) ? trim($_GET['search']) : '';
         $daftarPeminjam = $this->peminjamModel->getAllPeminjam($keyword);

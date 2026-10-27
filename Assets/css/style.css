@@ -36,9 +36,6 @@ body {
     min-height: 100vh;
 }
 
-/* ======================================================
-   DESKTOP APP LAYOUT (NAVBAR, SIDEBAR & MAIN CONTENT)
-   ====================================================== */
 .navbar {
     background: #ffffff;
     border-bottom: 1px solid var(--border-color);
@@ -169,7 +166,6 @@ body {
     flex-shrink: 0;
 }
 
-/* CONTAINER DESKTOP BERSEBELAHAN (FLEX ROW) */
 .app-container {
     display: flex;
     flex-direction: row;
@@ -181,7 +177,6 @@ body {
     align-items: flex-start;
 }
 
-/* SIDEBAR KIRI */
 .sidebar {
     width: 250px;
     flex-shrink: 0;
@@ -257,13 +252,11 @@ body {
     font-weight: 700;
 }
 
-/* MAIN CONTENT KANAN */
 .main-content {
     flex: 1;
     min-width: 0;
 }
 
-/* ADMIN HEADER ROW */
 .admin-header-row {
     display: flex;
     justify-content: space-between;
@@ -318,7 +311,6 @@ body {
     transform: translateY(-1px);
 }
 
-/* 4 METRIC CARDS GRID */
 .admin-metrics-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -372,7 +364,6 @@ body {
     color: var(--teal-dark);
 }
 
-/* INVENTORY CARD & TABLE */
 .inventory-section-card {
     background: #ffffff;
     border: 1px solid var(--border-color);
@@ -499,7 +490,6 @@ body {
     color: var(--badge-busy-text);
 }
 
-/* ACTION BUTTONS */
 .btn-action-edit {
     display: inline-flex;
     align-items: center;
@@ -585,7 +575,6 @@ body {
 .badge-role-petugas { background: #ccfbf1; color: #0f766e; }
 .badge-role-peminjam { background: #f1f5f9; color: #475569; }
 
-/* MODALS */
 .modal-overlay {
     display: none;
     position: fixed;
@@ -687,7 +676,6 @@ body {
     background: var(--teal-hover);
 }
 
-/* FORM CONTROLS */
 .form-group {
     margin-bottom: 18px;
 }
@@ -717,7 +705,6 @@ body {
     box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.2);
 }
 
-/* ALERTS */
 .auth-alert {
     padding: 12px 18px;
     border-radius: var(--radius-md);
@@ -741,9 +728,6 @@ body {
     border: 1px solid #bbf7d0;
 }
 
-/* ======================================================
-   LANDING PAGE & AUTH STYLES
-   ====================================================== */
 .hero-wrapper {
     background: radial-gradient(circle at 85% 30%, #174b5c 0%, #0d273a 50%, #091a27 100%);
     position: relative;
@@ -1089,7 +1073,6 @@ body {
     text-decoration: none;
 }
 
-/* SECTION FEATURES & ABOUT & FOOTER */
 .section-features {
     padding: 100px 24px;
     background: #ffffff;
@@ -1279,7 +1262,6 @@ body {
     color: #64748b;
 }
 
-/* AUTH PAGES */
 .auth-page-wrapper {
     min-height: 100vh;
     background: radial-gradient(circle at 85% 20%, #174b5c 0%, #0d273a 55%, #091a27 100%);
@@ -1376,9 +1358,6 @@ body {
     text-decoration: none;
 }
 
-/* ======================================================
-   MOBILE & RESPONSIVE COMPONENTS (BASE DEFINITIONS)
-   ====================================================== */
 .mobile-sidebar-toggle {
     display: none;
     align-items: center;
@@ -1544,9 +1523,6 @@ body.sidebar-open {
     margin-bottom: 40px;
 }
 
-/* ======================================================
-   RESPONSIVE MEDIA QUERIES (TABLET & MOBILE SCREEN <= 992px)
-   ====================================================== */
 @media (max-width: 992px) {
     .navbar {
         padding: 12px 20px;
@@ -1640,7 +1616,6 @@ body.sidebar-open {
         max-width: 100% !important;
     }
 
-    /* Landing Navbar Collapse */
     .landing-navbar {
         padding: 16px 20px;
     }
@@ -1703,7 +1678,6 @@ body.sidebar-open {
         padding: 10px 16px;
     }
 
-    /* Landing Content */
     .hero-container {
         grid-template-columns: 1fr;
         gap: 36px;
@@ -1731,9 +1705,6 @@ body.sidebar-open {
     }
 }
 
-/* ======================================================
-   MOBILE PHONES (SCREEN <= 768px)
-   ====================================================== */
 @media (max-width: 768px) {
     .table-mobile-hint {
         display: flex;
@@ -1819,9 +1790,6 @@ body.sidebar-open {
     }
 }
 
-/* ======================================================
-   SMALL PHONES (SCREEN <= 576px)
-   ====================================================== */
 @media (max-width: 576px) {
     .navbar {
         padding: 10px 14px;
@@ -1950,7 +1918,7 @@ body.sidebar-open {
     input[type="file"],
     select,
     textarea {
-        font-size: 16px !important; /* Prevents auto zoom on iOS Safari */
+        font-size: 16px !important;
         min-height: 44px;
         padding: 10px 14px;
     }

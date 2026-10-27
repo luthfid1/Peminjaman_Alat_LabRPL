@@ -10,8 +10,7 @@
 
 <div class="auth-page-wrapper" style="padding: 40px 20px;">
     <div class="auth-card" style="max-width: 520px;">
-        
-        <!-- BRAND -->
+
         <a href="index.php" class="auth-brand-center">
             <div class="brand-icon">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -26,14 +25,12 @@
         <h1 class="auth-heading">Pendaftaran Siswa</h1>
         <p class="auth-subheading">Registrasi akun untuk peminjaman alat laboratorium komputer</p>
 
-        <!-- ALERTS -->
         <?php if (!empty($error)): ?>
             <div class="auth-alert auth-alert-error">
                 <span><?= htmlspecialchars($error) ?></span>
             </div>
         <?php endif; ?>
 
-        <!-- FORM REGISTER -->
         <form method="POST" action="index.php?c=auth&a=register" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="nama" class="form-label">Nama Lengkap Siswa</label>

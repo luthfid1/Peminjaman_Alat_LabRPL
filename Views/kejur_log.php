@@ -21,7 +21,6 @@ require_once __DIR__ . '/kejur_header.php';
     </button>
 </div>
 
-<!-- AUDIT TRAIL CARD & TABLE -->
 <section class="inventory-section-card">
     <div class="inventory-header no-print">
         <div>

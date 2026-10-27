@@ -15,7 +15,6 @@ require_once __DIR__ . '/admin_header.php';
     </button>
 </div>
 
-<!-- ALERTS -->
 <?php if (!empty($message)): ?>
     <div class="auth-alert auth-alert-success">
         <span><?= htmlspecialchars($message) ?></span>
@@ -28,7 +27,6 @@ require_once __DIR__ . '/admin_header.php';
     </div>
 <?php endif; ?>
 
-<!-- INVENTORY CARD & TABLE -->
 <section class="inventory-section-card">
     <div class="inventory-header">
         <div>
@@ -85,7 +83,6 @@ require_once __DIR__ . '/admin_header.php';
     </table>
 </section>
 
-<!-- MODAL TAMBAH KATEGORI -->
 <div class="modal-overlay" id="modalTambahKategori">
     <div class="modal-content">
         <div class="modal-header">
@@ -106,7 +103,6 @@ require_once __DIR__ . '/admin_header.php';
     </div>
 </div>
 
-<!-- MODAL UBAH KATEGORI -->
 <div class="modal-overlay" id="modalUbahKategori">
     <div class="modal-content">
         <div class="modal-header">

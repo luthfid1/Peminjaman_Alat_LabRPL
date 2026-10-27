@@ -17,7 +17,6 @@ require_once __DIR__ . '/peminjam_header.php';
     </div>
 </div>
 
-<!-- 4 METRIC CARDS -->
 <div class="admin-metrics-grid">
     <div class="metric-card">
         <div class="metric-top-row">
@@ -82,7 +81,6 @@ require_once __DIR__ . '/peminjam_header.php';
     </div>
 </div>
 
-<!-- CTA LAB BANNER -->
 <div style="background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%); border-radius: 12px; padding: 22px 28px; color: white; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(20, 184, 166, 0.2);">
     <div>
         <h3 style="margin: 0 0 6px 0; font-size: 17px; font-weight: 700;">Perangkat Praktikum Lab Komputer Tersedia</h3>
@@ -93,7 +91,6 @@ require_once __DIR__ . '/peminjam_header.php';
     </a>
 </div>
 
-<!-- RIWAYAT PEMINJAMAN TERKINI -->
 <section class="inventory-section-card">
     <div class="inventory-header">
         <div>
@@ -206,7 +203,6 @@ require_once __DIR__ . '/peminjam_header.php';
     </table>
 </section>
 
-<!-- MODAL KONFIRMASI KEMBALIKAN ALAT -->
 <div class="modal-overlay" id="modalKembalikanAlat" style="display: none;">
     <div class="modal-content" style="max-width: 500px;">
         <div class="modal-header">
@@ -216,7 +212,7 @@ require_once __DIR__ . '/peminjam_header.php';
         <form method="POST" action="index.php?c=peminjam&a=kembalikan_alat">
             <input type="hidden" name="id_peminjaman" id="kembali_id_peminjaman">
             <input type="hidden" name="redirect" value="dashboard">
-            
+
             <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px;">
                 <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Perangkat yang Diajukan Kembali:</div>
                 <div style="font-weight: 700; color: var(--navy-primary); font-size: 15px;" id="kembali_nama_alat">-</div>

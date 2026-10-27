@@ -89,7 +89,7 @@ class AuthController {
             $nama             = trim($_POST['nama'] ?? '');
             $nis              = trim($_POST['nis'] ?? '');
             $kelas            = trim($_POST['kelas'] ?? '');
-            $jurusan          = 'Rekayasa Perangkat Lunak'; // Default lingkungan RPL
+            $jurusan          = 'Rekayasa Perangkat Lunak';
             $no_telp          = trim($_POST['no_telp'] ?? '');
             $username         = trim($_POST['username'] ?? '');
             $password         = trim($_POST['password'] ?? '');
@@ -140,13 +140,10 @@ class AuthController {
                         $foto_kartu = $newFileName;
 
                         try {
-                            // 1. Simpan akun ke tabel user
                             $userId = $this->userModel->createUser($nama, $username, $password, 'peminjam');
 
-                            // 2. Simpan profil siswa ke tabel peminjam (link userId)
                             $this->peminjamModel->createPeminjam($nama, $nis, $kelas, $jurusan, $no_telp, $foto_kartu, $userId);
 
-                            // 3. Catat riwayat log aktivitas
                             if ($userId) {
                                 $this->userModel->recordLog($userId, 'Registrasi Akun Siswa', "Pendaftaran siswa baru: {$nama} (NIS: {$nis})");
                             }

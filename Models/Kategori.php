@@ -79,7 +79,6 @@ class Kategori {
     public function deleteKategori($id) {
         $pk = $this->getPkCol();
 
-        // 1. Bersihkan anak-anak relasi (detail_peminjaman & alat terkait) agar tidak terkena Foreign Key constraint violation
         try {
             $colAlatPk = 'id_alat';
             $chkAlatPk = $this->conn->query("SHOW COLUMNS FROM alat LIKE 'id_alat'");
@@ -93,14 +92,11 @@ class Kategori {
 
             if (!empty($alatIds)) {
                 $inClause = implode(',', array_map('intval', $alatIds));
-                // Hapus detail transaksi peminjaman yang menggunakan alat dalam kategori ini
                 $this->conn->exec("DELETE FROM detail_peminjaman WHERE id_alat IN ($inClause)");
-                // Hapus seluruh alat dalam kategori ini
                 $this->conn->exec("DELETE FROM alat WHERE id_kategori = " . (int)$id);
             }
         } catch (Exception $e) {}
 
-        // 2. Hapus baris kategori
         $query = "DELETE FROM " . $this->table_name . " WHERE {$pk} = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);

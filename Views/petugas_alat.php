@@ -12,7 +12,6 @@ require_once __DIR__ . '/petugas_header.php';
     </div>
 </div>
 
-<!-- INVENTORY CARD & TABLE -->
 <section class="inventory-section-card">
     <div class="inventory-header">
         <div>

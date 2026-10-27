@@ -12,7 +12,6 @@ require_once __DIR__ . '/peminjam_header.php';
     </div>
 </div>
 
-<!-- SECTION KATEGORI CARD & TABLE -->
 <section class="inventory-section-card">
     <div class="inventory-header">
         <div>

@@ -1,5 +1,4 @@
 <?php
-// Aktifkan pelaporan error untuk debugging
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -8,11 +7,9 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Router MVC Switch Case
 $controller = isset($_GET['c']) ? strtolower(trim($_GET['c'])) : '';
 $action     = isset($_GET['a']) ? strtolower(trim($_GET['a'])) : '';
 
-// Routing default jika parameter kosong: tampilkan Landing Page terlebih dahulu
 if (empty($controller)) {
     $controller = 'home';
     $action     = 'index';
@@ -35,7 +32,6 @@ switch ($controller) {
                 $admin->dashboard();
                 break;
 
-            // CRUD ALAT
             case 'alat':
                 $admin->alat();
                 break;
@@ -49,7 +45,6 @@ switch ($controller) {
                 $admin->hapus_alat();
                 break;
 
-            // CRUD KATEGORI
             case 'kategori':
                 $admin->kategori();
                 break;
@@ -63,7 +58,6 @@ switch ($controller) {
                 $admin->hapus_kategori();
                 break;
 
-            // CRUD PENGGUNA (USER)
             case 'pengguna':
                 $admin->pengguna();
                 break;
@@ -77,7 +71,6 @@ switch ($controller) {
                 $admin->hapus_pengguna();
                 break;
 
-            // CRUD PEMINJAMAN
             case 'peminjaman':
                 $admin->peminjaman();
                 break;
@@ -91,7 +84,6 @@ switch ($controller) {
                 $admin->hapus_peminjaman();
                 break;
 
-            // CRUD PENGEMBALIAN
             case 'pengembalian':
                 $admin->pengembalian();
                 break;
@@ -105,7 +97,6 @@ switch ($controller) {
                 $admin->hapus_pengembalian();
                 break;
 
-            // LOG AKTIVITAS
             case 'log':
                 $admin->log();
                 break;
@@ -251,7 +242,6 @@ switch ($controller) {
         break;
 
     default:
-        // Jika route tidak dikenal, alihkan ke landing page
         header('Location: index.php?c=home&a=index');
         exit;
 }

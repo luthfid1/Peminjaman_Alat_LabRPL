@@ -12,9 +12,6 @@ require_once __DIR__ . '/admin_header.php';
     </div>
 </div>
 
-<!-- =============================================
-     SECTION: INFO ALAT SEDANG DIPINJAM
-     ============================================= -->
 <section class="inventory-section-card" style="margin-bottom: 24px;">
     <div class="inventory-header">
         <div>
@@ -102,9 +99,6 @@ require_once __DIR__ . '/admin_header.php';
     </table>
 </section>
 
-<!-- =============================================
-     SECTION: LOG AKTIVITAS SISTEM
-     ============================================= -->
 <section class="inventory-section-card">
     <div class="inventory-header">
         <div>

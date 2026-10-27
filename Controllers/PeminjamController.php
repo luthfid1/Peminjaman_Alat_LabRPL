@@ -63,7 +63,6 @@ class PeminjamController {
             $profile = $this->peminjamProfileModel->getPeminjamByNama($nama);
         }
 
-        // Jika siswa belum ada di tabel peminjam (misal akun demo bawaan), buatkan profil otomatis
         if (!$profile) {
             $newId = $this->peminjamProfileModel->createPeminjam(
                 $nama,
@@ -80,9 +79,6 @@ class PeminjamController {
         return $profile;
     }
 
-    // ==========================================
-    // 1. DASHBOARD SISWA
-    // ==========================================
     public function dashboard() {
         $profile = $this->getPeminjamProfile();
         $idPeminjam = (int)$profile['id'];
@@ -101,9 +97,6 @@ class PeminjamController {
         require_once __DIR__ . '/../Views/peminjam_dashboard.php';
     }
 
-    // ==========================================
-    // 2. KATALOG ALAT LAB KOMPUTER
-    // ==========================================
     public function daftar_alat() {
         $keyword = isset($_GET['search']) ? trim($_GET['search']) : '';
         $idKategori = isset($_GET['kategori']) ? (int)$_GET['kategori'] : 0;
@@ -120,9 +113,6 @@ class PeminjamController {
         require_once __DIR__ . '/../Views/peminjam_alat.php';
     }
 
-    // ==========================================
-    // 3. DAFTAR PEMINJAMAN SAYA
-    // ==========================================
     public function peminjaman() {
         $profile = $this->getPeminjamProfile();
         $idPeminjam = (int)$profile['id'];
@@ -151,9 +141,6 @@ class PeminjamController {
         require_once __DIR__ . '/../Views/peminjam_peminjaman.php';
     }
 
-    // ==========================================
-    // 4. PROSES AJUKAN PEMINJAMAN (MULTI-ALAT 1 TRANSAKSI)
-    // ==========================================
     public function ajukan_peminjaman() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $profile               = $this->getPeminjamProfile();
@@ -163,7 +150,6 @@ class PeminjamController {
             $jenis_peminjaman      = trim($_POST['jenis_peminjaman'] ?? 'Kebutuhan untuk Pembelajaran di Kelas');
             $keperluan             = trim($_POST['keperluan'] ?? '');
 
-            // Mengumpulkan seluruh item alat yang diajukan dalam 1 transaksi
             $rawItems = [];
             if (isset($_POST['items']) && is_array($_POST['items'])) {
                 foreach ($_POST['items'] as $it) {
@@ -193,7 +179,6 @@ class PeminjamController {
                 }
             }
 
-            // Gabungkan jika siswa memilih alat yang sama di baris berbeda
             $consolidated = [];
             foreach ($rawItems as $it) {
                 $idA = $it['id_alat'];
@@ -211,7 +196,6 @@ class PeminjamController {
                 exit;
             }
 
-            // Validasi keberadaan alat & kecukupan stok untuk setiap alat
             $summaryNames = [];
             foreach ($items as $it) {
                 $alat = $this->alatModel->getAlatById($it['id_alat']);
@@ -228,7 +212,6 @@ class PeminjamController {
                 $summaryNames[] = "{$alat['nama_alat']} ({$it['jumlah']} unit)";
             }
 
-            // Format waktu ke format TIME MySQL: HH:MM:SS
             if (strlen($waktu_pinjam) === 5) $waktu_pinjam .= ':00';
             if (strlen($waktu_rencana_kembali) === 5) $waktu_rencana_kembali .= ':00';
 
@@ -238,10 +221,9 @@ class PeminjamController {
             }
 
             try {
-                // Simpan transaksi peminjaman (1 kode transaksi untuk seluruh alat)
                 $newId = $this->peminjamanModel->createPeminjaman(
                     $idPeminjam,
-                    null, // Belum disetujui petugas (id_user petugas null)
+                    null,
                     $waktu_pinjam,
                     $waktu_rencana_kembali,
                     $jenis_peminjaman,
@@ -272,9 +254,6 @@ class PeminjamController {
         exit;
     }
 
-    // ==========================================
-    // 5. BATALKAN PEMINJAMAN
-    // ==========================================
     public function batalkan_peminjaman() {
         $id = (int)($_GET['id'] ?? 0);
         $profile = $this->getPeminjamProfile();
@@ -302,9 +281,6 @@ class PeminjamController {
         exit;
     }
 
-    // ==========================================
-    // 6. AJUKAN PENGEMBALIAN ALAT LAB (MENUNGGU VERIFIKASI PETUGAS)
-    // ==========================================
     public function kembalikan_alat() {
         $id = (int)($_POST['id_peminjaman'] ?? $_GET['id'] ?? 0);
         $catatan_siswa = trim($_POST['catatan_siswa'] ?? $_POST['kondisi_kembali'] ?? '');
@@ -314,12 +290,9 @@ class PeminjamController {
         if ($id > 0) {
             try {
                 $pmj = $this->peminjamanModel->getPeminjamanById($id);
-                // Pastikan peminjaman milik peminjam yang sedang login dan statusnya aktif (disetujui / dipinjam)
                 if ($pmj && ((int)$pmj['id_peminjam'] === $idPeminjam || (!empty($pmj['id_user']) && (int)$pmj['id_user'] === $this->getUserId())) && in_array(strtolower($pmj['status']), ['dipinjam', 'disetujui'])) {
-                    // Update status peminjaman menjadi 'menunggu_validasi' (TIDAK langsung selesai dan stok TIDAK bertambah sebelum diverifikasi Petugas)
                     $this->peminjamanModel->updateStatus($id, 'menunggu_validasi');
 
-                    // Catat notifikasi konfirmasi pengajuan pengembalian
                     $this->notifikasiModel->createNotifikasi(
                         $idPeminjam,
                         $id,
@@ -347,9 +320,6 @@ class PeminjamController {
         exit;
     }
 
-    // ==========================================
-    // 7. RIWAYAT PENGEMBALIAN SAYA
-    // ==========================================
     public function pengembalian() {
         $profile = $this->getPeminjamProfile();
         $idPeminjam = (int)$profile['id'];
@@ -366,7 +336,6 @@ class PeminjamController {
         $daftarPengembalian = $this->pengembalianModel->getPengembalianByPeminjamId($idPeminjam, $keyword);
         $totalDenda = $this->pengembalianModel->getTotalDendaByPeminjamId($idPeminjam);
 
-        // Ambil peminjaman aktif & menunggu pengembalian agar siswa dapat memantau status validasi
         $semuaPinjaman = $this->peminjamanModel->getPeminjamanByPeminjamId($idPeminjam);
         $daftarPeminjamanAktif = array_values(array_filter($semuaPinjaman, function($item) {
             return in_array(strtolower($item['status']), ['disetujui', 'dipinjam', 'menunggu_pengembalian']);

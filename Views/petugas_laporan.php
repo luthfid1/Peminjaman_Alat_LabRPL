@@ -15,7 +15,6 @@ require_once __DIR__ . '/petugas_header.php';
     </button>
 </div>
 
-<!-- PRINT HEADER (HANYA MUNCUL DI CETAK) -->
 <div style="display: none;" class="print-header">
     <div style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 20px;">
         <h2 style="margin: 0; font-size: 18px; text-transform: uppercase;">LAPORAN SIRKULASI PEMINJAMAN ALAT LABORATORIUM KOMPUTER</h2>
@@ -24,7 +23,6 @@ require_once __DIR__ . '/petugas_header.php';
     </div>
 </div>
 
-<!-- TABEL REKAP PEMINJAMAN -->
 <section class="inventory-section-card" style="margin-bottom: 30px;">
     <div class="inventory-header">
         <div>
@@ -71,7 +69,6 @@ require_once __DIR__ . '/petugas_header.php';
     </table>
 </section>
 
-<!-- TABEL REKAP PENGEMBALIAN -->
 <section class="inventory-section-card">
     <div class="inventory-header">
         <div>

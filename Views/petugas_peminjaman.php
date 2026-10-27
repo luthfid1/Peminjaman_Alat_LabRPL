@@ -12,7 +12,6 @@ require_once __DIR__ . '/petugas_header.php';
     </div>
 </div>
 
-<!-- ALERTS -->
 <?php if (!empty($message)): ?>
     <div class="auth-alert auth-alert-success">
         <span><?= htmlspecialchars($message) ?></span>
@@ -25,7 +24,6 @@ require_once __DIR__ . '/petugas_header.php';
     </div>
 <?php endif; ?>
 
-<!-- INVENTORY CARD & TABLE -->
 <section class="inventory-section-card">
     <div class="inventory-header">
         <div>
@@ -33,7 +31,6 @@ require_once __DIR__ . '/petugas_header.php';
             <p class="inventory-sub">Total <?= count($daftarPeminjaman) ?> data permohonan peminjaman tercatat.</p>
         </div>
         <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-            <!-- STATUS FILTER -->
             <form method="GET" action="index.php" style="margin: 0; display: flex; gap: 8px;">
                 <input type="hidden" name="c" value="petugas">
                 <input type="hidden" name="a" value="peminjaman">
@@ -50,7 +47,6 @@ require_once __DIR__ . '/petugas_header.php';
                 <?php endif; ?>
             </form>
 
-            <!-- SEARCH BOX -->
             <form method="GET" action="index.php" class="search-box" style="margin: 0;">
                 <input type="hidden" name="c" value="petugas">
                 <input type="hidden" name="a" value="peminjaman">
@@ -192,7 +188,6 @@ require_once __DIR__ . '/petugas_header.php';
     </table>
 </section>
 
-<!-- MODAL VERIFIKASI PENGEMBALIAN DI HALAMAN PEMINJAMAN PETUGAS -->
 <div class="modal-overlay" id="modalVerifikasiPengembalian" style="display: none;">
     <div class="modal-content" style="max-width: 580px; max-height: 90vh; overflow-y: auto;">
         <div class="modal-header">
@@ -294,7 +289,7 @@ function openModalVerifikasi(data) {
     document.getElementById('verif_nis_kelas').textContent = (data.nis || '-') + ' / ' + (data.kelas || '-');
     document.getElementById('verif_waktu_pinjam').textContent = data.waktu_pinjam ? data.waktu_pinjam.substring(0, 5) + ' WIB' : '-';
     document.getElementById('verif_waktu_rencana').textContent = data.waktu_rencana_kembali ? data.waktu_rencana_kembali.substring(0, 5) + ' WIB' : '-';
-    
+
     var now = new Date();
     var hh = String(now.getHours()).padStart(2, '0');
     var mm = String(now.getMinutes()).padStart(2, '0');

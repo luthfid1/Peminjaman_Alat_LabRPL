@@ -10,8 +10,7 @@
 
 <div class="auth-page-wrapper">
     <div class="auth-card">
-        
-        <!-- BRAND -->
+
         <a href="index.php" class="auth-brand-center">
             <div class="brand-icon">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -26,7 +25,6 @@
         <h1 class="auth-heading">Selamat Datang</h1>
         <p class="auth-subheading">Sistem Peminjaman Alat Laboratorium Komputer</p>
 
-        <!-- ALERTS -->
         <?php if (!empty($error)): ?>
             <div class="auth-alert auth-alert-error">
                 <span><?= htmlspecialchars($error) ?></span>
@@ -39,7 +37,6 @@
             </div>
         <?php endif; ?>
 
-        <!-- ACTIVE SESSION NOTICE -->
         <?php if (isset($_SESSION['user'])): ?>
             <div style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 14px; font-size: 12px; margin-bottom: 16px; color: #334155; display: flex; justify-content: space-between; align-items: center;">
                 <span>Sesi aktif: <strong><?= htmlspecialchars($_SESSION['user']['nama'] ?? $_SESSION['user']['nama_lengkap']) ?></strong> (<?= htmlspecialchars($_SESSION['user']['role']) ?>)</span>
@@ -47,7 +44,6 @@
             </div>
         <?php endif; ?>
 
-        <!-- FORM LOGIN -->
         <form method="POST" action="index.php?c=auth&a=login">
             <div class="form-group">
                 <label for="username" class="form-label">Username</label>

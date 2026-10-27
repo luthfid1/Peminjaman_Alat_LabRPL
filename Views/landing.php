@@ -9,8 +9,7 @@
 <body>
 
     <div class="hero-wrapper">
-        
-        <!-- NAVBAR -->
+
         <header class="landing-navbar">
             <a href="index.php" class="brand-group">
                 <div class="brand-icon">
@@ -55,7 +54,6 @@
             </div>
         </header>
 
-        <!-- HERO CONTENT -->
         <section class="hero-container">
             <div class="hero-text-col">
                 <div class="hero-tag">SISTEM PEMINJAMAN ALAT LAB KOMPUTER RPL</div>
@@ -84,7 +82,6 @@
                 </div>
             </div>
 
-            <!-- FLOATING MOCKUP CARD -->
             <div class="hero-mockup-wrapper">
                 <div class="mockup-card">
                     <div class="mockup-header-meta">
@@ -96,7 +93,6 @@
                     <p class="mockup-subheading">Pilih perangkat yang dibutuhkan untuk praktikum.</p>
 
                     <div class="mockup-item-list">
-                        <!-- ITEM 1 -->
                         <div class="mockup-item">
                             <div class="mockup-item-left">
                                 <div class="item-icon-circle icon-purple">
@@ -115,7 +111,6 @@
                             <span class="status-tag ready">Siap</span>
                         </div>
 
-                        <!-- ITEM 2 -->
                         <div class="mockup-item">
                             <div class="mockup-item-left">
                                 <div class="item-icon-circle icon-teal">
@@ -131,7 +126,6 @@
                             <span class="status-tag ready">Siap</span>
                         </div>
 
-                        <!-- ITEM 3 -->
                         <div class="mockup-item">
                             <div class="mockup-item-left">
                                 <div class="item-icon-circle icon-amber">
@@ -162,9 +156,6 @@
         </section>
     </div>
 
-    <!-- ==========================================
-         SECTION: KEUNGGULAN SISTEM LAB
-         ========================================== -->
     <section class="section-features" id="keunggulan">
         <div class="features-header">
             <span class="section-tag-center">FASILITAS & FITUR</span>
@@ -175,7 +166,6 @@
         </div>
 
         <div class="features-grid">
-            <!-- CARD 1 -->
             <div class="feature-card">
                 <div class="feature-icon-box icon-box-mint">
                     <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -191,7 +181,6 @@
                 </a>
             </div>
 
-            <!-- CARD 2 -->
             <div class="feature-card">
                 <div class="feature-icon-box icon-box-peach">
                     <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -206,7 +195,6 @@
                 </a>
             </div>
 
-            <!-- CARD 3 -->
             <div class="feature-card">
                 <div class="feature-icon-box icon-box-purple">
                     <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -222,9 +210,6 @@
         </div>
     </section>
 
-    <!-- ==========================================
-         SECTION: TENTANG LAB KOMPUTER
-         ========================================== -->
     <section class="section-about" id="tentang">
         <div class="about-container">
             <div>
@@ -241,9 +226,6 @@
         </div>
     </section>
 
-    <!-- ==========================================
-         FOOTER
-         ========================================== -->
     <footer class="footer">
         <div class="footer-container">
             <div class="footer-top">
