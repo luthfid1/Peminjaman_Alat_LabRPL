@@ -106,16 +106,37 @@ class User {
     }
 
     public function deleteUser($id_user) {
-        try {
-            $this->conn->exec("UPDATE peminjaman SET id_user = NULL WHERE id_user = " . (int)$id_user);
-            $this->conn->exec("DELETE FROM peminjam WHERE id_user = " . (int)$id_user);
-            $this->conn->exec("DELETE FROM log_aktivitas WHERE id_user = " . (int)$id_user);
-        } catch (Exception $e) {}
+        $id = (int)$id_user;
 
-        $query = "DELETE FROM " . $this->table_name . " WHERE id_user = :id_user";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':id_user', $id_user, PDO::PARAM_INT);
-        return $stmt->execute();
+        $this->conn->beginTransaction();
+        try {
+            
+            $this->conn->exec("DELETE FROM log_aktivitas WHERE id_user = $id");
+            $this->conn->exec("DELETE FROM pengembalian WHERE id_user = $id");
+            $this->conn->exec(
+                "DELETE pengembalian FROM pengembalian
+                 INNER JOIN peminjaman ON pengembalian.id_peminjaman = peminjaman.id_peminjaman
+                 WHERE peminjaman.id_user = $id"
+            );
+            $this->conn->exec(
+                "DELETE detail_peminjaman FROM detail_peminjaman
+                 INNER JOIN peminjaman ON detail_peminjaman.id_peminjaman = peminjaman.id_peminjaman
+                 WHERE peminjaman.id_user = $id"
+            );
+
+            $this->conn->exec("DELETE FROM peminjaman WHERE id_user = $id");
+            $this->conn->exec("DELETE FROM peminjam WHERE id_user = $id");
+
+            $stmt = $this->conn->prepare("DELETE FROM " . $this->table_name . " WHERE id_user = :id_user");
+            $stmt->bindParam(':id_user', $id, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $this->conn->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->conn->rollBack();
+            throw $e;
+        }
     }
 
     public function recordLog($id_user, $aktivitas, $deskripsi = '') {
